@@ -78,6 +78,13 @@ If you've published the translations into your app and you'd like to check those
 php artisan filament:check-translations es --source=app
 ```
 
+You need to fix the translations where the string has changed. If you want to check the strings, you can show all translations:
+
+```bash
+php artisan filament:list-translations es
+php artisan filament:check-translations es --source=app
+```
+
 ## Security vulnerabilities
 
 If you discover a security vulnerability within Filament, please email Dan Harrin via [dan@danharrin.com](mailto:dan@danharrin.com). All security vulnerabilities will be promptly addressed.

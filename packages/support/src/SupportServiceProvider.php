@@ -11,6 +11,7 @@ use Filament\Support\Colors\ColorManager;
 use Filament\Support\Commands\AboutCommand as FilamentAboutCommand;
 use Filament\Support\Commands\AssetsCommand;
 use Filament\Support\Commands\CheckTranslationsCommand;
+use Filament\Support\Commands\ListTranslationsCommand;
 use Filament\Support\Commands\InstallCommand;
 use Filament\Support\Commands\MakeIssueCommand;
 use Filament\Support\Commands\OptimizeClearCommand;
@@ -50,6 +51,7 @@ class SupportServiceProvider extends PackageServiceProvider
             ->hasCommands([
                 AssetsCommand::class,
                 CheckTranslationsCommand::class,
+                ListTranslationsCommand::class,
                 FilamentAboutCommand::class,
                 InstallCommand::class,
                 MakeIssueCommand::class,
