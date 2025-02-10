@@ -1,4 +1,10 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-@tailwind variants;
+@import 'tailwindcss';
+@import '../../../../packages/support/resources/css/tailwind.css';
+
+@source '../views';
+@source '../../app';
+@source '../../../../packages';
+
+@theme {
+    --font-sans: Inter, ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+}

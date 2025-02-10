@@ -1,5 +1,5 @@
 @php
-    use Filament\Support\Enums\MaxWidth;
+    use Filament\Support\Enums\Width;
 @endphp
 
 <x-filament-panels::layout.base :livewire="$livewire">
@@ -22,13 +22,15 @@
                     x-bind:class="{
                         'fi-main-ctn-sidebar-open': $store.sidebar.isOpen,
                     }"
-                    x-bind:style="'display: flex; opacity:1;'" {{-- Mimics `x-cloak`, as using `x-cloak` causes visual issues with chart widgets --}}
+                    x-bind:style="'display: flex; opacity:1;'"
+                    {{-- Mimics `x-cloak`, as using `x-cloak` causes visual issues with chart widgets --}}
                 @elseif (filament()->isSidebarFullyCollapsibleOnDesktop())
                     x-data="{}"
                     x-bind:class="{
                         'fi-main-ctn-sidebar-open': $store.sidebar.isOpen,
                     }"
-                    x-bind:style="'display: flex; opacity:1;'" {{-- Mimics `x-cloak`, as using `x-cloak` causes visual issues with chart widgets --}}
+                    x-bind:style="'display: flex; opacity:1;'"
+                    {{-- Mimics `x-cloak`, as using `x-cloak` causes visual issues with chart widgets --}}
                 @elseif (! (filament()->isSidebarCollapsibleOnDesktop() || filament()->isSidebarFullyCollapsibleOnDesktop() || filament()->hasTopNavigation() || (! filament()->hasNavigation())))
                     x-data="{}"
                     x-bind:style="'display: flex; opacity:1;'" {{-- Mimics `x-cloak`, as using `x-cloak` causes visual issues with chart widgets --}}
@@ -43,28 +45,28 @@
                 <main
                     @class([
                         'fi-main mx-auto h-full w-full px-4 md:px-6 lg:px-8',
-                        match ($maxContentWidth ??= (filament()->getMaxContentWidth() ?? MaxWidth::SevenExtraLarge)) {
-                            MaxWidth::ExtraSmall, 'xs' => 'max-w-xs',
-                            MaxWidth::Small, 'sm' => 'max-w-sm',
-                            MaxWidth::Medium, 'md' => 'max-w-md',
-                            MaxWidth::Large, 'lg' => 'max-w-lg',
-                            MaxWidth::ExtraLarge, 'xl' => 'max-w-xl',
-                            MaxWidth::TwoExtraLarge, '2xl' => 'max-w-2xl',
-                            MaxWidth::ThreeExtraLarge, '3xl' => 'max-w-3xl',
-                            MaxWidth::FourExtraLarge, '4xl' => 'max-w-4xl',
-                            MaxWidth::FiveExtraLarge, '5xl' => 'max-w-5xl',
-                            MaxWidth::SixExtraLarge, '6xl' => 'max-w-6xl',
-                            MaxWidth::SevenExtraLarge, '7xl' => 'max-w-7xl',
-                            MaxWidth::Full, 'full' => 'max-w-full',
-                            MaxWidth::MinContent, 'min' => 'max-w-min',
-                            MaxWidth::MaxContent, 'max' => 'max-w-max',
-                            MaxWidth::FitContent, 'fit' => 'max-w-fit',
-                            MaxWidth::Prose, 'prose' => 'max-w-prose',
-                            MaxWidth::ScreenSmall, 'screen-sm' => 'max-w-screen-sm',
-                            MaxWidth::ScreenMedium, 'screen-md' => 'max-w-screen-md',
-                            MaxWidth::ScreenLarge, 'screen-lg' => 'max-w-screen-lg',
-                            MaxWidth::ScreenExtraLarge, 'screen-xl' => 'max-w-screen-xl',
-                            MaxWidth::ScreenTwoExtraLarge, 'screen-2xl' => 'max-w-screen-2xl',
+                        match ($maxContentWidth ??= (filament()->getMaxContentWidth() ?? Width::SevenExtraLarge)) {
+                            Width::ExtraSmall, 'xs' => 'max-w-xs',
+                            Width::Small, 'sm' => 'max-w-sm',
+                            Width::Medium, 'md' => 'max-w-md',
+                            Width::Large, 'lg' => 'max-w-lg',
+                            Width::ExtraLarge, 'xl' => 'max-w-xl',
+                            Width::TwoExtraLarge, '2xl' => 'max-w-2xl',
+                            Width::ThreeExtraLarge, '3xl' => 'max-w-3xl',
+                            Width::FourExtraLarge, '4xl' => 'max-w-4xl',
+                            Width::FiveExtraLarge, '5xl' => 'max-w-5xl',
+                            Width::SixExtraLarge, '6xl' => 'max-w-6xl',
+                            Width::SevenExtraLarge, '7xl' => 'max-w-7xl',
+                            Width::Full, 'full' => 'max-w-full',
+                            Width::MinContent, 'min' => 'max-w-min',
+                            Width::MaxContent, 'max' => 'max-w-max',
+                            Width::FitContent, 'fit' => 'max-w-fit',
+                            Width::Prose, 'prose' => 'max-w-prose',
+                            Width::ScreenSmall, 'screen-sm' => 'max-w-(--breakpoint-sm)',
+                            Width::ScreenMedium, 'screen-md' => 'max-w-(--breakpoint-md)',
+                            Width::ScreenLarge, 'screen-lg' => 'max-w-(--breakpoint-lg)',
+                            Width::ScreenExtraLarge, 'screen-xl' => 'max-w-(--breakpoint-xl)',
+                            Width::ScreenTwoExtraLarge, 'screen-2xl' => 'max-w-(--breakpoint-2xl)',
                             default => $maxContentWidth,
                         },
                     ])
@@ -86,7 +88,7 @@
                     x-on:click="$store.sidebar.close()"
                     x-show="$store.sidebar.isOpen"
                     x-transition.opacity.300ms
-                    class="fi-sidebar-close-overlay fixed inset-0 z-30 bg-gray-950/50 transition duration-500 dark:bg-gray-950/75 lg:hidden"
+                    class="fi-sidebar-close-overlay fixed inset-0 z-30 bg-gray-950/50 transition duration-500 lg:hidden dark:bg-gray-950/75"
                 ></div>
 
                 @livewire(\Filament\Livewire\Sidebar::class)

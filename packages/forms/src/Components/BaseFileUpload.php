@@ -47,6 +47,8 @@ class BaseFileUpload extends Field implements Contracts\HasNestedRecursiveValida
 
     protected int | Closure | null $minSize = null;
 
+    protected int | Closure | null $maxParallelUploads = null;
+
     protected int | Closure | null $maxFiles = null;
 
     protected int | Closure | null $minFiles = null;
@@ -345,6 +347,13 @@ class BaseFileUpload extends Field implements Contracts\HasNestedRecursiveValida
         return $this;
     }
 
+    public function maxParallelUploads(int | Closure | null $count): static
+    {
+        $this->maxParallelUploads = $count;
+
+        return $this;
+    }
+
     public function maxFiles(int | Closure | null $count): static
     {
         $this->maxFiles = $count;
@@ -490,6 +499,11 @@ class BaseFileUpload extends Field implements Contracts\HasNestedRecursiveValida
     public function getMinSize(): ?int
     {
         return $this->evaluate($this->minSize);
+    }
+
+    public function getMaxParallelUploads(): ?int
+    {
+        return $this->evaluate($this->maxParallelUploads);
     }
 
     public function getVisibility(): string

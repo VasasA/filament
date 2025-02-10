@@ -33,30 +33,10 @@
     }
 
     & > .fi-icon {
-        @apply size-6 text-gray-400 dark:text-gray-500;
+        @apply text-gray-400 dark:text-gray-500;
 
-        &.fi-size-xs {
-            @apply size-3;
-        }
-
-        &.fi-size-sm {
-            @apply size-4;
-        }
-
-        &.fi-size-md {
-            @apply size-5;
-        }
-
-        &.fi-size-xl {
-            @apply size-7;
-        }
-
-        &.fi-size-2xl {
-            @apply size-8;
-        }
-
-        &.fi-color-custom {
-            @apply text-custom-500 dark:text-custom-400;
+        &.fi-color {
+            @apply text-(--text) dark:text-(--dark-text);
         }
     }
 }

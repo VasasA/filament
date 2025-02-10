@@ -3,7 +3,7 @@
 ])
 
 @php
-    $openSidebarClasses = 'fi-sidebar-open w-[--sidebar-width] translate-x-0 shadow-xl ring-1 ring-gray-950/5 dark:ring-white/10 rtl:-translate-x-0';
+    $openSidebarClasses = 'fi-sidebar-open w-(--sidebar-width) translate-x-0 ring-1 shadow-xl ring-gray-950/5 rtl:-translate-x-0 dark:ring-white/10';
     $isRtl = __('filament-panels::layout.direction') === 'rtl';
 @endphp
 
@@ -15,7 +15,7 @@
         x-bind:class="
             $store.sidebar.isOpen
                 ? @js($openSidebarClasses . ' ' . 'lg:sticky')
-                : '-translate-x-full rtl:translate-x-full lg:sticky lg:translate-x-0 rtl:lg:-translate-x-0'
+                : '-translate-x-full rtl:translate-x-full lg:sticky lg:translate-x-0 lg:rtl:-translate-x-0'
         "
     @else
         @if (filament()->hasTopNavigation())
@@ -29,21 +29,21 @@
             x-bind:class="
                 $store.sidebar.isOpen
                     ? @js($openSidebarClasses . ' ' . 'lg:sticky')
-                    : 'w-[--sidebar-width] -translate-x-full rtl:translate-x-full lg:sticky'
+                    : 'w-(--sidebar-width) -translate-x-full rtl:translate-x-full lg:sticky'
             "
         @endif
     @endif
     {{
         $attributes->class([
             'fi-sidebar fixed inset-y-0 start-0 lg:h-[calc(100dvh-4rem)] lg:top-[4rem] z-30 flex flex-col h-screen content-start bg-white transition-all dark:bg-gray-900 lg:z-0 lg:bg-transparent lg:shadow-none lg:ring-0 lg:transition-none dark:lg:bg-transparent',
-            'lg:translate-x-0 rtl:lg:-translate-x-0' => ! (filament()->isSidebarCollapsibleOnDesktop() || filament()->isSidebarFullyCollapsibleOnDesktop() || filament()->hasTopNavigation()),
-            'lg:-translate-x-full rtl:lg:translate-x-full' => filament()->hasTopNavigation(),
+            'lg:translate-x-0 lg:rtl:-translate-x-0' => ! (filament()->isSidebarCollapsibleOnDesktop() || filament()->isSidebarFullyCollapsibleOnDesktop() || filament()->hasTopNavigation()),
+            'lg:-translate-x-full lg:rtl:translate-x-full' => filament()->hasTopNavigation(),
         ])
     }}
 >
     <div class="overflow-x-clip lg:hidden">
         <header
-            class="fi-sidebar-header flex h-16 items-center bg-white px-6 ring-1 ring-gray-950/5 dark:bg-gray-900 dark:ring-white/10 lg:shadow-sm"
+            class="fi-sidebar-header flex h-16 items-center bg-white px-6 ring-1 ring-gray-950/5 dark:bg-gray-900 dark:ring-white/10 lg:shadow-xs"
         >
             @if ($homeUrl = filament()->getHomeUrl())
                 <a {{ \Filament\Support\generate_href_html($homeUrl) }}>
@@ -56,7 +56,7 @@
     </div>
 
     <nav
-        class="fi-sidebar-nav flex-grow flex flex-col gap-y-7 overflow-y-auto overflow-x-hidden px-6 py-8"
+        class="fi-sidebar-nav grow flex flex-col gap-y-7 overflow-y-auto overflow-x-hidden px-6 py-8"
         style="scrollbar-gutter: stable"
     >
         {{ \Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::SIDEBAR_NAV_START) }}

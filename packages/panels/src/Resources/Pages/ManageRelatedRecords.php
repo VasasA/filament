@@ -2,6 +2,7 @@
 
 namespace Filament\Resources\Pages;
 
+use BackedEnum;
 use Closure;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
@@ -23,6 +24,7 @@ use Filament\Schemas\Components\RenderHook;
 use Filament\Schemas\Components\TableBuilder;
 use Filament\Schemas\Schema;
 use Filament\Support\Facades\FilamentIcon;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables;
 use Filament\View\PanelsRenderHook;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -71,11 +73,11 @@ class ManageRelatedRecords extends Page implements Tables\Contracts\HasTable
     #[Url]
     public ?string $activeTab = null;
 
-    public static function getNavigationIcon(): string | Htmlable | null
+    public static function getNavigationIcon(): string | BackedEnum | Htmlable | null
     {
         return static::$navigationIcon
             ?? FilamentIcon::resolve('panels::resources.pages.manage-related-records.navigation-item')
-            ?? 'heroicon-o-rectangle-stack';
+            ?? Heroicon::OutlinedRectangleStack;
     }
 
     public function mount(int | string $record): void
@@ -153,14 +155,14 @@ class ManageRelatedRecords extends Page implements Tables\Contracts\HasTable
         return $this->getRecord();
     }
 
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
-        return $form;
+        return $schema;
     }
 
-    public function infolist(Schema $infolist): Schema
+    public function infolist(Schema $schema): Schema
     {
-        return $infolist;
+        return $schema;
     }
 
     /**

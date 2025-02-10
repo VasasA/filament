@@ -82,14 +82,14 @@ class ListRecords extends Page implements Tables\Contracts\HasTable
         return static::$title ?? static::getResource()::getTitleCasePluralModelLabel();
     }
 
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
-        return static::getResource()::form($form);
+        return static::getResource()::form($schema);
     }
 
-    public function infolist(Schema $infolist): Schema
+    public function infolist(Schema $schema): Schema
     {
-        return static::getResource()::infolist($infolist);
+        return static::getResource()::infolist($schema);
     }
 
     public function getDefaultActionSchemaResolver(Action $action): ?Closure

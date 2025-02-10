@@ -18,7 +18,7 @@ class Tabs extends Component
     /**
      * @var view-string
      */
-    protected string $view = 'filament-schema::components.tabs';
+    protected string $view = 'filament-schemas::components.tabs';
 
     protected int | Closure $activeTab = 1;
 

@@ -18,6 +18,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Tests\Fixtures\Models\Post;
@@ -37,6 +38,10 @@ class PostsTable extends Component implements HasActions, HasForms, Tables\Contr
     {
         return $table
             ->query(Post::query())
+            ->groups(fn () => [
+                Tables\Grouping\Group::make('author.name')
+                    ->label(fn (Table $table, self $livewire) => 'Dynamic label'),
+            ])
             ->columns([
                 Tables\Columns\TextColumn::make('title')
                     ->sortable()
@@ -85,7 +90,19 @@ class PostsTable extends Component implements HasActions, HasForms, Tables\Contr
                     ->state('correct state'),
                 Tables\Columns\TextColumn::make('formatted_state')
                     ->formatStateUsing(fn () => 'formatted state'),
+                Tables\Columns\TextColumn::make('json.foo')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('json.bar.baz')
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('json_array_of_objects.*.value'),
+                Tables\Columns\TextColumn::make('author.json.foo')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('author.json.bar.baz')
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('extra_attributes')
                     ->extraAttributes([
                         'class' => 'text-danger-500',
@@ -116,6 +133,8 @@ class PostsTable extends Component implements HasActions, HasForms, Tables\Contr
                     ])
                     ->attribute('is_published'),
                 Tables\Filters\TrashedFilter::make(),
+                Tables\Filters\Filter::make('hidden')
+                    ->hidden(),
             ])
             ->persistFiltersInSession()
             ->headerActions([
@@ -152,7 +171,7 @@ class PostsTable extends Component implements HasActions, HasForms, Tables\Contr
                     Action::make('groupedWithHiddenGroupCondition'),
                 ])->hidden(fn (?Model $record): bool => $record !== null),
                 Action::make('hasIcon')
-                    ->icon('heroicon-m-pencil-square'),
+                    ->icon(Heroicon::PencilSquare),
                 Action::make('hasLabel')
                     ->label('My Action'),
                 Action::make('hasColor')
@@ -297,7 +316,7 @@ class PostsTable extends Component implements HasActions, HasForms, Tables\Contr
                 BulkAction::make('disabled')
                     ->disabled(),
                 BulkAction::make('hasIcon')
-                    ->icon('heroicon-m-pencil-square'),
+                    ->icon(Heroicon::PencilSquare),
                 BulkAction::make('hasLabel')
                     ->label('My Action'),
                 BulkAction::make('hasColor')

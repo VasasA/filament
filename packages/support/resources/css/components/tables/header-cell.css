@@ -1,5 +1,5 @@
 .fi-ta-header-cell {
-    @apply px-3 py-3.5 text-start text-sm font-semibold text-gray-950 dark:text-white sm:first-of-type:ps-6 sm:last-of-type:pe-6;
+    @apply px-3 py-3.5 text-start text-sm font-semibold text-gray-950 sm:first-of-type:ps-6 sm:last-of-type:pe-6 dark:text-white;
 
     &.fi-growable {
         @apply w-full;
@@ -127,12 +127,12 @@
     }
 
     & .fi-icon {
-        @apply size-5 shrink-0 transition duration-75;
+        @apply shrink-0 transition duration-75;
     }
 }
 
 .fi-ta-header-group-cell {
-    @apply border-gray-200 px-3 py-2 text-sm font-semibold text-gray-950 dark:border-white/5 dark:text-white sm:first-of-type:ps-6 sm:last-of-type:pe-6 [&:not(:first-of-type)]:border-s [&:not(:last-of-type)]:border-e;
+    @apply border-gray-200 px-3 py-2 text-sm font-semibold text-gray-950 sm:first-of-type:ps-6 sm:last-of-type:pe-6 dark:border-white/5 dark:text-white [&:not(:first-of-type)]:border-s [&:not(:last-of-type)]:border-e;
 
     &.fi-align-start {
         @apply text-start;

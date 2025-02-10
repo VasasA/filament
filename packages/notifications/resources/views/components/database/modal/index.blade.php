@@ -1,6 +1,8 @@
 @props([
     'notifications',
     'unreadNotificationsCount',
+    'clearNotificationsAction',
+    'markAllNotificationsAsReadAction',
 ])
 
 @php
@@ -15,7 +17,7 @@
     close-button
     :description="$hasNotifications ? null : __('filament-notifications::database.modal.empty.description')"
     :heading="$hasNotifications ? null : __('filament-notifications::database.modal.empty.heading')"
-    :icon="$hasNotifications ? null : 'heroicon-o-bell-slash'"
+    :icon="$hasNotifications ? null : \Filament\Support\Icons\Heroicon::OutlinedBellSlash"
     :icon-alias="$hasNotifications ? null : 'notifications::database.modal.empty-state'"
     :icon-color="$hasNotifications ? null : 'gray'"
     id="database-notifications"
@@ -33,6 +35,8 @@
                 <x-filament-notifications::database.modal.actions
                     :notifications="$notifications"
                     :unread-notifications-count="$unreadNotificationsCount"
+                    :clear-notifications-action="$clearNotificationsAction"
+                    :mark-all-notifications-as-read-action="$markAllNotificationsAsReadAction"
                 />
             </div>
         </x-slot>
@@ -47,7 +51,7 @@
             @foreach ($notifications as $notification)
                 <div
                     @class([
-                        'relative before:absolute before:start-0 before:h-full before:w-0.5 before:bg-primary-600 dark:before:bg-primary-500' => $notification->unread(),
+                        'before:bg-primary-600 dark:before:bg-primary-500 relative before:absolute before:start-0 before:h-full before:w-0.5' => $notification->unread(),
                     ])
                 >
                     {{ $this->getNotification($notification)->inline() }}

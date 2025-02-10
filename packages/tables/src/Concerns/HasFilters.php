@@ -157,7 +157,7 @@ trait HasFilters
             );
         }
 
-        return $query->where(function (Builder $query) {
+        return $query->where(function (Builder $query): void {
             foreach ($this->getTable()->getFilters() as $filter) {
                 $filter->apply(
                     $query,

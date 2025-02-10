@@ -5,6 +5,7 @@ use Filament\Navigation\NavigationBuilder;
 use Filament\Navigation\NavigationGroup;
 use Filament\Navigation\NavigationItem;
 use Filament\Pages\Dashboard;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tests\Fixtures\Pages\Settings;
 use Filament\Tests\Fixtures\Resources\PostCategories\PostCategoryResource;
 use Filament\Tests\Fixtures\Resources\Posts\PostResource;
@@ -44,13 +45,13 @@ it('can register navigation', function () {
                 ->sequence(
                     fn ($item) => $item
                         ->getLabel()->toBe('Dashboard')
-                        ->getIcon()->toBe('heroicon-o-home'),
+                        ->getIcon()->toBe(Heroicon::OutlinedHome),
                     fn ($item) => $item
                         ->getLabel()->toBe('Users')
-                        ->getIcon()->toBe('heroicon-o-user'),
+                        ->getIcon()->toBe(Heroicon::OutlinedUser),
                     fn ($item) => $item
                         ->getLabel()->toBe('Settings')
-                        ->getIcon()->toBe('heroicon-o-cog-6-tooth'),
+                        ->getIcon()->toBe(Heroicon::OutlinedCog6Tooth),
                 )
                 ->each->toBeInstanceOf(NavigationItem::class),
             fn ($group) => $group
@@ -60,10 +61,10 @@ it('can register navigation', function () {
                 ->sequence(
                     fn ($item) => $item
                         ->getLabel()->toBe('Posts')
-                        ->getIcon()->toBe('heroicon-o-document-text'),
+                        ->getIcon()->toBe(Heroicon::OutlinedDocumentText),
                     fn ($item) => $item
                         ->getLabel()->toBe('Post Categories')
-                        ->getIcon()->toBe('heroicon-o-rectangle-stack'),
+                        ->getIcon()->toBe(Heroicon::OutlinedRectangleStack),
                 )
                 ->each->toBeInstanceOf(NavigationItem::class),
             fn ($group) => $group
@@ -73,7 +74,7 @@ it('can register navigation', function () {
                 ->sequence(
                     fn ($item) => $item
                         ->getLabel()->toBe('Products')
-                        ->getIcon()->toBe('heroicon-o-shopping-bag'),
+                        ->getIcon()->toBe(Heroicon::OutlinedShoppingBag),
                 )
                 ->each->toBeInstanceOf(NavigationItem::class),
         );
@@ -97,10 +98,10 @@ it('can register navigation groups individually', function () {
                 ->sequence(
                     fn ($item) => $item
                         ->getLabel()->toBe('Posts')
-                        ->getIcon()->toBe('heroicon-o-document-text'),
+                        ->getIcon()->toBe(Heroicon::OutlinedDocumentText),
                     fn ($item) => $item
                         ->getLabel()->toBe('Post Categories')
-                        ->getIcon()->toBe('heroicon-o-rectangle-stack'),
+                        ->getIcon()->toBe(Heroicon::OutlinedRectangleStack),
                 )
                 ->each->toBeInstanceOf(NavigationItem::class),
         );

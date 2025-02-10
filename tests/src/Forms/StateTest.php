@@ -255,6 +255,100 @@ test('custom logic can be executed after state is hydrated', function () {
         ->getData()->toBe([$statePath => strrev($value)]);
 });
 
+test('state can be hydrated partially', function () {
+    Schema::make($livewire = Livewire::make())
+        ->statePath('data')
+        ->components([
+            (new Component)
+                ->statePath($statePath = Str::random()),
+            (new Component)
+                ->statePath($statePath2 = Str::random()),
+        ])
+        ->fill([
+            $statePath => Str::random(),
+            $statePath2 => ($state2 = Str::random()),
+        ])
+        ->fillPartially([
+            $statePath => ($state = Str::random()),
+            $statePath2 => Str::random(),
+        ], statePaths: [$statePath]);
+
+    expect($livewire)
+        ->getData()->toBe([
+            $statePath => $state,
+            $statePath2 => $state2,
+        ]);
+});
+
+test('child state can be hydrated partially', function () {
+    Schema::make($livewire = Livewire::make())
+        ->statePath('data')
+        ->components([
+            (new Component)
+                ->statePath($parentStatePath = Str::random())
+                ->schema([
+                    (new Component)
+                        ->statePath($statePath = Str::random()),
+                    (new Component)
+                        ->statePath($statePath2 = Str::random()),
+                ]),
+        ])
+        ->fill([
+            $parentStatePath => [
+                $statePath => Str::random(),
+                $statePath2 => ($state2 = Str::random()),
+            ],
+        ])
+        ->fillPartially([
+            $parentStatePath => [
+                $statePath => ($state = Str::random()),
+                $statePath2 => Str::random(),
+            ],
+        ], statePaths: ["{$parentStatePath}.{$statePath}"]);
+
+    expect($livewire)
+        ->getData()->toBe([
+            $parentStatePath => [
+                $statePath => $state,
+                $statePath2 => $state2,
+            ],
+        ]);
+});
+
+test('custom logic can be executed after state hydrated partially, only for components that are hydrated partially', function () {
+    $container = Schema::make($livewire = Livewire::make())
+        ->statePath('data')
+        ->components([
+            (new Component)
+                ->statePath($statePath = Str::random())
+                ->afterStateHydrated(fn (Component $component, $state) => $component->state(strrev($state))),
+            (new Component)
+                ->statePath($statePath2 = Str::random())
+                ->afterStateHydrated(fn (Component $component, $state) => $component->state(strrev($state))),
+        ])
+        ->fill([
+            $statePath => $state = Str::random(),
+            $statePath2 => ($state2 = Str::random()),
+        ]);
+
+    expect($livewire)
+        ->getData()->toBe([
+            $statePath => strrev($state),
+            $statePath2 => strrev($state2),
+        ]);
+
+    $container->fillPartially([
+        $statePath => ($state = Str::random()),
+        $statePath2 => Str::random(),
+    ], statePaths: [$statePath]);
+
+    expect($livewire)
+        ->getData()->toBe([
+            $statePath => strrev($state),
+            $statePath2 => strrev($state2),
+        ]);
+});
+
 test('custom logic can be executed after state is updated', function () {
     Schema::make($livewire = Livewire::make())
         ->statePath('data')

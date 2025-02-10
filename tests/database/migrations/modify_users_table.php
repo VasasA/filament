@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->after('password', function (Blueprint $table) {
+                $table->json('json')->nullable();
                 $table->string('email_code_authentication_secret')->nullable();
                 $table->string('google_two_factor_authentication_secret')->nullable();
                 $table->text('google_two_factor_authentication_recovery_codes')->nullable();

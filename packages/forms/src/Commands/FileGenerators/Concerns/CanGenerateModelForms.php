@@ -97,6 +97,35 @@ trait CanGenerateModelForms
                 default => TextInput::class,
             };
 
+            $enumCasts = $this->getEnumCasts($model);
+
+            if (isset($type['name']) && (($type['name'] === 'enum') || array_key_exists($componentName, $enumCasts))) {
+                $componentData['type'] = Select::class;
+
+                if (array_key_exists($componentName, $enumCasts)) {
+                    $enumClass = $enumCasts[$componentName];
+
+                    $this->namespace->addUse($enumClass);
+
+                    $componentData['options'] = [new Literal(class_basename($enumClass) . '::class')];
+                } else {
+                    $componentData['options'] = [array_combine(
+                        $type['values'],
+                        array_map(
+                            fn (string $value): string => (string) str($value)
+                                ->kebab()
+                                ->replace(['-', '_'], ' ')
+                                ->ucfirst(),
+                            $type['values'],
+                        ),
+                    )];
+                }
+
+                if ($column['default']) {
+                    $componentData['default'] = [$this->parseDefaultExpression($column, $model)];
+                }
+            }
+
             if (str($componentName)->endsWith('_id')) {
                 $guessedRelationshipName = $this->guessBelongsToRelationshipName($componentName, $model);
 

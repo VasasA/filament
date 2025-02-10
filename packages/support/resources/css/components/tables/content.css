@@ -2,7 +2,7 @@
     @apply relative divide-y divide-gray-200 overflow-x-auto dark:divide-white/10 dark:border-t-white/10;
 
     & .fi-ta-content-header {
-        @apply flex items-center gap-4 gap-x-6 bg-gray-50 px-4 dark:bg-white/5 sm:px-6;
+        @apply flex items-center gap-4 gap-x-6 bg-gray-50 px-4 sm:px-6 dark:bg-white/5;
 
         & .fi-ta-page-checkbox {
             @apply my-4;
@@ -26,11 +26,11 @@
             }
 
             & .fi-ta-group-header {
-                @apply -mx-4 w-[calc(100%+2rem)] border-y border-gray-200 first:border-t-0 dark:border-white/5 sm:-mx-6 sm:w-[calc(100%+3rem)];
+                @apply -mx-4 w-[calc(100%+2rem)] border-y border-gray-200 first:border-t-0 sm:-mx-6 sm:w-[calc(100%+3rem)] dark:border-white/5;
             }
 
             & .fi-ta-record {
-                @apply rounded-xl shadow-sm ring-1 ring-gray-950/5 dark:bg-white/5 dark:ring-white/10;
+                @apply rounded-xl ring-1 shadow-sm ring-gray-950/5 dark:bg-white/5 dark:ring-white/10;
 
                 &.fi-clickable {
                     @apply dark:hover:bg-white/10 dark:hover:ring-white/20;
@@ -75,7 +75,7 @@
                 }
 
                 &.fi-selected {
-                    @apply before:absolute before:inset-y-0 before:start-0 before:w-0.5 before:bg-primary-600 dark:bg-white/5 dark:before:bg-primary-500;
+                    @apply before:bg-primary-600 dark:before:bg-primary-500 before:absolute before:inset-y-0 before:start-0 before:w-0.5 dark:bg-white/5;
                 }
 
                 & .fi-ta-record-content-ctn {
@@ -253,7 +253,7 @@
                         @apply hidden 2xl:block;
                     }
 
-                    & .fi-ta-col-wrp {
+                    & .fi-ta-col {
                         @apply flex justify-start text-start disabled:pointer-events-none;
 
                         &.fi-growable {

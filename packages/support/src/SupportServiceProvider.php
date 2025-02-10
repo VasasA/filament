@@ -20,9 +20,11 @@ use Filament\Support\Components\ComponentManager;
 use Filament\Support\Components\Contracts\ScopedComponentManager;
 use Filament\Support\Enums\GridDirection;
 use Filament\Support\Facades\FilamentAsset;
+use Filament\Support\Facades\FilamentColor;
 use Filament\Support\Icons\IconManager;
 use Filament\Support\Overrides\DataStoreOverride;
 use Filament\Support\Partials\SupportPartials;
+use Filament\Support\View\Components\Contracts\HasColor;
 use Filament\Support\View\ViewManager;
 use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Support\Facades\Blade;
@@ -156,6 +158,10 @@ class SupportServiceProvider extends PackageServiceProvider
             return preg_replace('/\s*@trim\s*/m', '', $view);
         });
 
+        ComponentAttributeBag::macro('color', function (string | HasColor $component, ?string $color): ComponentAttributeBag {
+            return $this->class(FilamentColor::getComponentClasses($component, $color));
+        });
+
         ComponentAttributeBag::macro('grid', function (array | int | null $columns = [], GridDirection $direction = GridDirection::Row): ComponentAttributeBag {
             if (! is_array($columns)) {
                 $columns = ['lg' => $columns];
@@ -179,8 +185,8 @@ class SupportServiceProvider extends PackageServiceProvider
                 ])
                 ->style(array_map(
                     fn (string $breakpoint, int $columns): string => match ($direction) {
-                        GridDirection::Row => "--cols-{$breakpoint}: repeat({$columns}, minmax(0, 1fr))",
-                        GridDirection::Column => "--cols-{$breakpoint}: {$columns}",
+                        GridDirection::Row => '--cols-' . str_replace('!', 'n', str_replace('@', 'c', $breakpoint)) . ": repeat({$columns}, minmax(0, 1fr))",
+                        GridDirection::Column => '--cols-' . str_replace('!', 'n', str_replace('@', 'c', $breakpoint)) . ": {$columns}",
                     },
                     array_keys($columns),
                     array_values($columns),
@@ -197,6 +203,7 @@ class SupportServiceProvider extends PackageServiceProvider
             }
 
             $span = array_filter($span);
+
             $start = array_filter($start);
 
             return $this
@@ -220,7 +227,7 @@ class SupportServiceProvider extends PackageServiceProvider
                 ])
                 ->style([
                     ...array_map(
-                        fn (string $breakpoint, int | string $span): string => "--col-span-{$breakpoint}: " . match ($span) {
+                        fn (string $breakpoint, int | string $span): string => '--col-span-' . str_replace('!', 'n', str_replace('@', 'c', $breakpoint)) . ': ' . match ($span) {
                             'full' => '1 / -1',
                             default => "span {$span} / span {$span}",
                         },
@@ -228,7 +235,7 @@ class SupportServiceProvider extends PackageServiceProvider
                         array_values($span),
                     ),
                     ...array_map(
-                        fn (string $breakpoint, int $start): string => "--col-start-{$breakpoint}: {$start}",
+                        fn (string $breakpoint, int $start): string => '--col-start-' . str_replace('!', 'n', str_replace('@', 'c', $breakpoint)) . ': ' . $start,
                         array_keys($start),
                         array_values($start),
                     ),
@@ -304,13 +311,11 @@ class SupportServiceProvider extends PackageServiceProvider
                 $this->package->basePath('/../config/filament.php') => config_path('filament.php'),
             ], 'filament-config');
 
-            if (method_exists($this, 'optimizes')) {
-                $this->optimizes(
-                    optimize: 'filament:optimize', /** @phpstan-ignore-line */
-                    clear: 'filament:optimize-clear', /** @phpstan-ignore-line */
-                    key: 'filament', /** @phpstan-ignore-line */
-                );
-            }
+            $this->optimizes(
+                optimize: 'filament:optimize', /** @phpstan-ignore-line */
+                clear: 'filament:optimize-clear', /** @phpstan-ignore-line */
+                key: 'filament', /** @phpstan-ignore-line */
+            );
         }
     }
 }

@@ -20,12 +20,8 @@ class RepeatableEntry extends Entry
     /**
      * @return array<Schema>
      */
-    public function getChildComponentContainers(bool $withHidden = false): array
+    public function getItems(): array
     {
-        if ((! $withHidden) && $this->isHidden()) {
-            return [];
-        }
-
         $containers = [];
 
         foreach ($this->getState() ?? [] as $itemKey => $itemData) {
@@ -43,5 +39,13 @@ class RepeatableEntry extends Entry
         }
 
         return $containers;
+    }
+
+    /**
+     * @return array<Schema>
+     */
+    public function getDefaultChildComponentContainers(): array
+    {
+        return $this->getItems();
     }
 }

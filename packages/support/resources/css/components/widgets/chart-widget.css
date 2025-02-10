@@ -11,13 +11,13 @@
         }
     }
 
-    & .fi-color-custom {
+    & .fi-color {
         & .fi-wi-chart-bg-color {
-            @apply text-custom-50 dark:text-custom-400/10;
+            @apply text-color-50 dark:text-color-400/10;
         }
 
         & .fi-wi-chart-border-color {
-            @apply text-custom-500 dark:text-custom-400;
+            @apply text-color-500 dark:text-color-400;
         }
     }
 

@@ -3,6 +3,7 @@
 use Filament\Actions\Action;
 use Filament\Actions\Testing\Fixtures\TestAction;
 use Filament\Notifications\Notification;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tests\Actions\TestCase;
 use Filament\Tests\Fixtures\Pages\Actions;
 use Illuminate\Support\Str;
@@ -236,8 +237,8 @@ it('can disable an action', function () {
 
 it('can have an icon', function () {
     livewire(Actions::class)
-        ->assertActionHasIcon('hasIcon', 'heroicon-m-pencil-square')
-        ->assertActionDoesNotHaveIcon('hasIcon', 'heroicon-m-trash');
+        ->assertActionHasIcon('hasIcon', Heroicon::PencilSquare)
+        ->assertActionDoesNotHaveIcon('hasIcon', Heroicon::Trash);
 });
 
 it('can have a label', function () {

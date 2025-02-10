@@ -9,6 +9,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
 
@@ -55,7 +56,7 @@ class Actions extends Component implements HasActions, HasForms
                             ->disabled(),
                         Action::make('enabled'),
                         Action::make('hasIcon')
-                            ->icon('heroicon-m-pencil-square'),
+                            ->icon(Heroicon::PencilSquare),
                         Action::make('hasLabel')
                             ->label('My Action'),
                         Action::make('hasColor')

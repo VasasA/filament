@@ -16,7 +16,7 @@
                 'fi-no-notification-icon',
                 match ($color) {
                     'gray' => 'text-gray-400',
-                    default => 'fi-color-custom text-custom-400',
+                    default => 'fi-color text-color-400',
                 },
                 is_string($color) ? 'fi-color-' . $color : null,
                 match ($size) {

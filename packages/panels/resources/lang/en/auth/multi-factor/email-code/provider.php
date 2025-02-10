@@ -5,16 +5,27 @@ return [
     'management_schema' => [
 
         'actions' => [
-            'label' => 'Email code authentication',
+
+            'label' => 'Email verification codes',
+
+            'below_content' => 'Receive a temporary code at your email address to verify your identity during login.',
+
+            'messages' => [
+                'enabled' => 'Enabled',
+                'disabled' => 'Disabled',
+            ],
+
         ],
 
     ],
 
     'login_form' => [
 
+        'label' => 'Send a code to your email',
+
         'code' => [
 
-            'label' => 'Enter the code we sent you by email',
+            'label' => 'Enter the 6-digit code we sent you by email',
 
             'validation_attribute' => 'code',
 

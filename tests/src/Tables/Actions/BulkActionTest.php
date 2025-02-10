@@ -2,6 +2,7 @@
 
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\Testing\Fixtures\TestAction;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tests\Fixtures\Livewire\PostsTable;
 use Filament\Tests\Fixtures\Models\Post;
 use Filament\Tests\Tables\TestCase;
@@ -153,12 +154,12 @@ it('can disable a bulk action', function () {
 
 it('can have an icon', function () {
     livewire(PostsTable::class)
-        ->assertActionHasIcon(TestAction::make('hasIcon')->table()->bulk(), 'heroicon-m-pencil-square')
-        ->assertActionDoesNotHaveIcon(TestAction::make('hasIcon')->table()->bulk(), 'heroicon-m-trash');
+        ->assertActionHasIcon(TestAction::make('hasIcon')->table()->bulk(), Heroicon::PencilSquare)
+        ->assertActionDoesNotHaveIcon(TestAction::make('hasIcon')->table()->bulk(), Heroicon::Trash);
 
     livewire(PostsTable::class)
-        ->assertTableBulkActionHasIcon('hasIcon', 'heroicon-m-pencil-square')
-        ->assertTableBulkActionDoesNotHaveIcon('hasIcon', 'heroicon-m-trash');
+        ->assertTableBulkActionHasIcon('hasIcon', Heroicon::PencilSquare)
+        ->assertTableBulkActionDoesNotHaveIcon('hasIcon', Heroicon::Trash);
 });
 
 it('can have a label', function () {

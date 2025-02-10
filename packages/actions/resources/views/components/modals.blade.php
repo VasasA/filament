@@ -37,31 +37,24 @@
             openModal: function () {
                 const id = this.generateModalId(this.actionNestingIndex)
 
-                if (! this.$el.querySelector(`#${id}`)) {
-                    return
-                }
-
                 this.$dispatch('open-modal', { id })
             },
 
             closeModal: function () {
                 const id = this.generateModalId(this.actionNestingIndex)
 
-                if (! this.$el.querySelector(`#${id}`)) {
-                    return
-                }
-
                 this.$dispatch('close-modal-quietly', { id })
             },
         }"
         x-on:sync-action-modals.window="
-            if ($event.detail.id === '{{ $this->getId() }}')
-                syncActionModals($event.detail.newActionNestingIndex)
+            if ($event.detail.id === @js($this->getId())) syncActionModals($event.detail.newActionNestingIndex)
         "
         style="height: 0"
     >
         @foreach ($this->getMountedActions() as $action)
-            {{ $action->toModalHtmlable() }}
+            @if ((! $loop->last) || $this->mountedActionShouldOpenModal())
+                {{ $action->toModalHtmlable() }}
+            @endif
         @endforeach
     </div>
 

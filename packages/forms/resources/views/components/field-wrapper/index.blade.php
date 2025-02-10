@@ -29,14 +29,14 @@
         $statePath ??= $field->getStatePath();
     }
 
-    $beforeLabelDecorations = $field?->getDecorations($field::BEFORE_LABEL_DECORATIONS);
-    $afterLabelDecorations = $field?->getDecorations($field::AFTER_LABEL_DECORATIONS);
-    $aboveContentDecorations = $field?->getDecorations($field::ABOVE_CONTENT_DECORATIONS);
-    $belowContentDecorations = $field?->getDecorations($field::BELOW_CONTENT_DECORATIONS);
-    $beforeContentDecorations = $field?->getDecorations($field::BEFORE_CONTENT_DECORATIONS);
-    $afterContentDecorations = $field?->getDecorations($field::AFTER_CONTENT_DECORATIONS);
-    $aboveErrorMessageDecorations = $field?->getDecorations($field::ABOVE_ERROR_MESSAGE_DECORATIONS);
-    $belowErrorMessageDecorations = $field?->getDecorations($field::BELOW_ERROR_MESSAGE_DECORATIONS);
+    $beforeLabelContainer = $field?->getChildComponentContainer($field::BEFORE_LABEL_CONTAINER)?->toHtmlString();
+    $afterLabelContainer = $field?->getChildComponentContainer($field::AFTER_LABEL_CONTAINER)?->toHtmlString();
+    $aboveContentContainer = $field?->getChildComponentContainer($field::ABOVE_CONTENT_CONTAINER)?->toHtmlString();
+    $belowContentContainer = $field?->getChildComponentContainer($field::BELOW_CONTENT_CONTAINER)?->toHtmlString();
+    $beforeContentContainer = $field?->getChildComponentContainer($field::BEFORE_CONTENT_CONTAINER)?->toHtmlString();
+    $afterContentContainer = $field?->getChildComponentContainer($field::AFTER_CONTENT_CONTAINER)?->toHtmlString();
+    $aboveErrorMessageContainer = $field?->getChildComponentContainer($field::ABOVE_ERROR_MESSAGE_CONTAINER)?->toHtmlString();
+    $belowErrorMessageContainer = $field?->getChildComponentContainer($field::BELOW_ERROR_MESSAGE_CONTAINER)?->toHtmlString();
 
     $hasError = filled($statePath) && ($errors->has($statePath) || ($hasNestedRecursiveValidationRules && $errors->has("{$statePath}.*")));
 @endphp
@@ -66,16 +66,16 @@
             } => $hasInlineLabel,
         ])
     >
-        {{ $field?->getDecorations($field::ABOVE_LABEL_DECORATIONS) }}
+        {{ $field?->getChildComponentContainer($field::ABOVE_LABEL_CONTAINER) }}
 
-        @if (($label && (! $labelSrOnly)) || $labelPrefix || $labelSuffix || $beforeLabelDecorations || $afterLabelDecorations)
+        @if (($label && (! $labelSrOnly)) || $labelPrefix || $labelSuffix || $beforeLabelContainer || $afterLabelContainer)
             <div
                 @class([
                     'flex items-center gap-x-3',
                     ($label instanceof \Illuminate\View\ComponentSlot) ? $label->attributes->get('class') : null,
                 ])
             >
-                {{ $beforeLabelDecorations }}
+                {{ $beforeLabelContainer }}
 
                 @if ($label && (! $labelSrOnly))
                     <x-filament-forms::field-wrapper.label
@@ -93,38 +93,38 @@
                     {{ $labelSuffix }}
                 @endif
 
-                {{ $afterLabelDecorations }}
+                {{ $afterLabelContainer }}
             </div>
         @endif
 
-        {{ $field?->getDecorations($field::BELOW_LABEL_DECORATIONS) }}
+        {{ $field?->getChildComponentContainer($field::BELOW_LABEL_CONTAINER) }}
 
-        @if ((! \Filament\Support\is_slot_empty($slot)) || $hasError || $aboveContentDecorations || $belowContentDecorations || $beforeContentDecorations || $afterContentDecorations || $aboveErrorMessageDecorations || $belowErrorMessageDecorations)
+        @if ((! \Filament\Support\is_slot_empty($slot)) || $hasError || $aboveContentContainer || $belowContentContainer || $beforeContentContainer || $afterContentContainer || $aboveErrorMessageContainer || $belowErrorMessageContainer)
             <div
                 @class([
                     'grid auto-cols-fr gap-y-2',
                     'sm:col-span-2' => $hasInlineLabel,
                 ])
             >
-                {{ $aboveContentDecorations }}
+                {{ $aboveContentContainer }}
 
-                @if ($beforeContentDecorations || $afterContentDecorations)
+                @if ($beforeContentContainer || $afterContentContainer)
                     <div class="flex w-full items-center gap-x-3">
-                        {{ $beforeContentDecorations }}
+                        {{ $beforeContentContainer }}
 
                         <div class="w-full">
                             {{ $slot }}
                         </div>
 
-                        {{ $afterContentDecorations }}
+                        {{ $afterContentContainer }}
                     </div>
                 @else
                     {{ $slot }}
                 @endif
 
-                {{ $belowContentDecorations }}
+                {{ $belowContentContainer }}
 
-                {{ $aboveErrorMessageDecorations }}
+                {{ $aboveErrorMessageContainer }}
 
                 @if ($hasError)
                     <x-filament-forms::field-wrapper.error-message>
@@ -132,7 +132,7 @@
                     </x-filament-forms::field-wrapper.error-message>
                 @endif
 
-                {{ $belowErrorMessageDecorations }}
+                {{ $belowErrorMessageContainer }}
             </div>
         @endif
     </div>

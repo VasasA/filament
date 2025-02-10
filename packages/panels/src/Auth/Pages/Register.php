@@ -15,8 +15,8 @@ use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Pages\Concerns\CanUseDatabaseTransactions;
 use Filament\Pages\SimplePage;
+use Filament\Schemas\Components\Actions;
 use Filament\Schemas\Components\Component;
-use Filament\Schemas\Components\Decorations\FormActionsDecorations;
 use Filament\Schemas\Components\Form;
 use Filament\Schemas\Components\NestedSchema;
 use Filament\Schemas\Components\RenderHook;
@@ -148,9 +148,9 @@ class Register extends SimplePage
         $user->notify($notification);
     }
 
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
-        return $form;
+        return $schema;
     }
 
     /**
@@ -305,8 +305,10 @@ class Register extends SimplePage
         return Form::make([NestedSchema::make('form')])
             ->id('form')
             ->livewireSubmitHandler('register')
-            ->footer(FormActionsDecorations::make($this->getFormActions())
-                ->alignment($this->getFormActionsAlignment())
-                ->fullWidth($this->hasFullWidthFormActions()));
+            ->footer([
+                Actions::make($this->getFormActions())
+                    ->alignment($this->getFormActionsAlignment())
+                    ->fullWidth($this->hasFullWidthFormActions()),
+            ]);
     }
 }

@@ -3,7 +3,7 @@
     use Filament\Support\Enums\Alignment;
     use Illuminate\View\ComponentAttributeBag;
 
-    $containers = $getChildComponentContainers();
+    $items = $getItems();
 
     $addAction = $getAction($getAddActionName());
     $cloneAction = $getAction($getCloneActionName());
@@ -31,7 +31,7 @@
                 ->class(['fi-fo-simple-repeater grid gap-y-4'])
         }}
     >
-        @if (count($containers))
+        @if (count($items))
             <ul>
                 <div
                     x-sortable
@@ -45,7 +45,7 @@
                             ->class(['gap-4'])
                     }}
                 >
-                    @foreach ($containers as $uuid => $item)
+                    @foreach ($items as $uuid => $item)
                         @php
                             $visibleExtraItemActions = array_filter(
                                 $extraItemActions,

@@ -7,16 +7,16 @@ use Filament\Actions\ActionGroup;
 use Filament\Schemas\Components\Wizard;
 use Filament\Schemas\Schema;
 
-trait HasWizard
+trait HasWizard /** @phpstan-ignore trait.unused */
 {
     public function getStartStep(): int
     {
         return 1;
     }
 
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
-        return parent::form($form)
+        return parent::form($schema)
             ->schema([
                 Wizard::make($this->getSteps())
                     ->startOnStep($this->getStartStep())

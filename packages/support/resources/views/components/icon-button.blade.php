@@ -1,6 +1,8 @@
 @php
     use Filament\Support\Enums\ActionSize;
     use Filament\Support\Enums\IconSize;
+    use Filament\Support\View\Components\Badge;
+    use Filament\Support\View\Components\IconButton;
     use Illuminate\View\ComponentAttributeBag;
 @endphp
 
@@ -32,18 +34,15 @@
         $size = filled($size) ? (ActionSize::tryFrom($size) ?? $size) : null;
     }
 
-    $iconSize ??= match ($size) {
-        ActionSize::ExtraSmall => IconSize::Small,
-        ActionSize::Small, ActionSize::Medium => IconSize::Medium,
-        ActionSize::Large, ActionSize::ExtraLarge => IconSize::Large,
-        default => IconSize::Medium,
-    };
-
-    if (! $iconSize instanceof IconSize) {
-        $iconSize = filled($iconSize) ? (IconSize::tryFrom($iconSize) ?? $iconSize) : null;
+    if (filled($iconSize) && (! $iconSize instanceof IconSize)) {
+        $iconSize = IconSize::tryFrom($iconSize) ?? $iconSize;
     }
 
-    $iconClasses = ($iconSize instanceof IconSize) ? ('fi-size-' . $iconSize->value) : (is_string($iconSize) ? $iconSize : '');
+    $iconSize ??= match ($size) {
+        ActionSize::ExtraSmall => IconSize::Small,
+        ActionSize::Large, ActionSize::ExtraLarge => IconSize::Large,
+        default => null,
+    };
 
     if (! $badgeSize instanceof ActionSize) {
         $badgeSize = filled($badgeSize) ? (ActionSize::tryFrom($badgeSize) ?? $badgeSize) : null;
@@ -89,7 +88,7 @@
                 'wire:target' => ($hasLoadingIndicator && $loadingIndicatorTarget) ? $loadingIndicatorTarget : null,
             ], escape: false)
             ->merge([
-                'title' => $label,
+                'title' => $hasTooltip ? null : $label,
             ], escape: true)
             ->when(
                 $disabled && filled($tooltip),
@@ -100,27 +99,16 @@
             ->class([
                 'fi-icon-btn',
                 'fi-disabled' => $disabled,
-                match ($color) {
-                    'gray' => '',
-                    default => 'fi-color-custom',
-                },
-                is_string($color) ? "fi-color-{$color}" : null,
                 ($size instanceof ActionSize) ? "fi-size-{$size->value}" : (is_string($size) ? $size : ''),
             ])
-            ->style([
-                \Filament\Support\get_color_css_variables(
-                    $color,
-                    shades: [300, 400, 500, 600],
-                    alias: 'icon-button',
-                ),
-            ])
+            ->color(IconButton::class, $color)
     }}
 >
     {{
         \Filament\Support\generate_icon_html($icon, $iconAlias, (new \Illuminate\View\ComponentAttributeBag([
             'wire:loading.remove.delay.' . config('filament.livewire_loading_delay', 'default') => $hasLoadingIndicator,
             'wire:target' => $hasLoadingIndicator ? $loadingIndicatorTarget : false,
-        ]))->class([$iconClasses]))
+        ])), size: $iconSize)
     }}
 
     @if ($hasLoadingIndicator)
@@ -128,36 +116,25 @@
             \Filament\Support\generate_loading_indicator_html((new \Illuminate\View\ComponentAttributeBag([
                 'wire:loading.delay.' . config('filament.livewire_loading_delay', 'default') => '',
                 'wire:target' => $loadingIndicatorTarget,
-            ]))->class([$iconClasses]))
+            ])), size: $iconSize)
         }}
     @endif
 
     @if (filled($badge))
         <div class="fi-icon-btn-badge-ctn">
-            <span
-                @class([
-                    'fi-badge',
-                    match ($badgeColor) {
-                        'gray' => '',
-                        default => 'fi-color-custom',
-                    },
-                    is_string($badgeColor) ? "fi-color-{$badgeColor}" : null,
-                    ($badgeSize instanceof ActionSize) ? "fi-size-{$badgeSize->value}" : (is_string($badgeSize) ? $badgeSize : ''),
-                ])
-                @style([
-                    \Filament\Support\get_color_css_variables(
-                        $badgeColor,
-                        shades: [
-                            50,
-                            400,
-                            600,
-                        ],
-                        alias: 'badge',
-                    ) => $badgeColor !== 'gray',
-                ])
-            >
+            @if ($badge instanceof \Illuminate\View\ComponentSlot)
                 {{ $badge }}
-            </span>
+            @else
+                <span
+                    @class([
+                        'fi-badge',
+                        ...\Filament\Support\get_component_color_classes(Badge::class, $badgeColor),
+                        ($badgeSize instanceof ActionSize) ? "fi-size-{$badgeSize->value}" : (is_string($badgeSize) ? $badgeSize : ''),
+                    ])
+                >
+                    {{ $badge }}
+                </span>
+            @endif
         </div>
     @endif
 </{{ $tag }}>

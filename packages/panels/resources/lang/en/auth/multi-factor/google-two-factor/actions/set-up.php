@@ -6,7 +6,7 @@ return [
 
     'modal' => [
 
-        'heading' => 'Set up two-factor authentication app',
+        'heading' => 'Set up authenticator app',
 
         'description' => <<<'BLADE'
             You'll need an app like Google Authenticator (<x-filament::link href="https://itunes.apple.com/us/app/google-authenticator/id388497605" target="_blank">iOS</x-filament::link>, <x-filament::link href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2" target="_blank">Android</x-filament::link>) to complete this process.
@@ -26,8 +26,6 @@ return [
 
                 'instruction' => 'Or enter this code manually:',
 
-                'copy_hint' => '(click to copy)',
-
                 'messages' => [
                     'copied' => 'Copied',
                 ],
@@ -36,7 +34,7 @@ return [
 
             'recovery_codes' => [
 
-                'instruction' => 'Please save the following recovery codes in a safe place. You won\'t see them again, but you\'ll need them if you lose access to your app:',
+                'instruction' => 'Please save the following recovery codes in a safe place. They will only be shown once, but you\'ll need them if you lose access to your authenticator app:',
 
             ],
 
@@ -46,11 +44,11 @@ return [
 
             'code' => [
 
-                'label' => 'Enter a code from the app',
+                'label' => 'Enter the 6-digit code from the authenticator app',
 
                 'validation_attribute' => 'code',
 
-                'below_content' => 'You\'ll need to put a code like this in each time you sign in.',
+                'below_content' => 'You will need to enter the 6-digit code from your authenticator app each time you sign in or perform sensitive actions.',
 
                 'messages' => [
 
@@ -65,7 +63,7 @@ return [
         'actions' => [
 
             'submit' => [
-                'label' => 'Enable two-factor authentication',
+                'label' => 'Enable authenticator app',
             ],
 
         ],
@@ -75,7 +73,7 @@ return [
     'notifications' => [
 
         'enabled' => [
-            'title' => 'Two-factor app authentication has been enabled',
+            'title' => 'Authenticator app has been enabled',
         ],
 
     ],

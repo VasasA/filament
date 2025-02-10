@@ -7,10 +7,11 @@ use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 
 class Actions extends Page
 {
-    protected static string $view = 'pages.actions';
+    protected string $view = 'pages.actions';
 
     protected function getHeaderActions(): array
     {
@@ -121,7 +122,7 @@ class Actions extends Page
             Action::make('disabled')
                 ->disabled(),
             Action::make('hasIcon')
-                ->icon('heroicon-m-pencil-square'),
+                ->icon(Heroicon::PencilSquare),
             Action::make('hasLabel')
                 ->label('My Action'),
             Action::make('hasColor')

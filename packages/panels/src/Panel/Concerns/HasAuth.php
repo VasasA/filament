@@ -4,6 +4,8 @@ namespace Filament\Panel\Concerns;
 
 use Closure;
 use Filament\Auth\MultiFactor\Contracts\MultiFactorAuthenticationProvider;
+use Filament\Auth\MultiFactor\Http\Middleware\EnsureMultiFactorAuthenticationIsEnabled;
+use Filament\Auth\MultiFactor\Pages\SetUpRequiredMultiFactorAuthentication;
 use Filament\Auth\Pages\EditProfile;
 use Filament\Auth\Pages\EmailVerification\EmailVerificationPrompt;
 use Filament\Auth\Pages\Login;
@@ -15,7 +17,7 @@ use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 
@@ -23,14 +25,23 @@ trait HasAuth
 {
     protected string | Closure $emailVerifiedMiddlewareName = 'verified';
 
+    protected string | Closure $multiFactorAuthenticationRequiredMiddlewareName = EnsureMultiFactorAuthenticationIsEnabled::class;
+
     /**
      * @var string | Closure | array<class-string, string> | null
      */
     protected string | Closure | array | null $emailVerificationRouteAction = null;
 
+    /**
+     * @var string | Closure | array<class-string, string> | null
+     */
+    protected string | Closure | array | null $setUpRequiredMultiFactorAuthenticationRouteAction = null;
+
     protected bool | Closure $hasEmailChangeVerification = false;
 
     protected string $emailVerificationPromptRouteSlug = 'prompt';
+
+    protected string $setUpRequiredMultiFactorAuthenticationRouteSlug = 'set-up';
 
     protected string $emailVerificationRouteSlug = 'verify';
 
@@ -38,9 +49,13 @@ trait HasAuth
 
     protected string $emailVerificationRoutePrefix = 'email-verification';
 
+    protected string $multiFactorAuthenticationRoutePrefix = 'multi-factor-authentication';
+
     protected string $emailChangeVerificationRoutePrefix = 'email-change-verification';
 
-    protected bool $isEmailVerificationRequired = false;
+    protected bool | Closure $isEmailVerificationRequired = false;
+
+    protected bool | Closure $isMultiFactorAuthenticationRequired = false;
 
     /**
      * @var string | Closure | array<class-string, string> | null
@@ -92,7 +107,7 @@ trait HasAuth
     /**
      * @param  string | Closure | array<class-string, string> | null  $promptAction
      */
-    public function emailVerification(string | Closure | array | null $promptAction = EmailVerificationPrompt::class, bool $isRequired = true): static
+    public function emailVerification(string | Closure | array | null $promptAction = EmailVerificationPrompt::class, bool | Closure $isRequired = true): static
     {
         $this->emailVerificationRouteAction = $promptAction;
         $this->requiresEmailVerification($isRequired);
@@ -135,6 +150,20 @@ trait HasAuth
         return $this;
     }
 
+    public function setUpRequiredMultiFactorAuthenticationRouteSlug(string $slug): static
+    {
+        $this->setUpRequiredMultiFactorAuthenticationRouteSlug = $slug;
+
+        return $this;
+    }
+
+    public function multiFactorAuthenticationRoutePrefix(string $prefix): static
+    {
+        $this->multiFactorAuthenticationRoutePrefix = $prefix;
+
+        return $this;
+    }
+
     public function emailChangeVerificationRoutePrefix(string $prefix): static
     {
         $this->emailChangeVerificationRoutePrefix = $prefix;
@@ -149,9 +178,23 @@ trait HasAuth
         return $this;
     }
 
-    public function requiresEmailVerification(bool $condition = true): static
+    public function multiFactorAuthenticationRequiredMiddlewareName(string | Closure $name): static
+    {
+        $this->multiFactorAuthenticationRequiredMiddlewareName = $name;
+
+        return $this;
+    }
+
+    public function requiresEmailVerification(bool | Closure $condition = true): static
     {
         $this->isEmailVerificationRequired = $condition;
+
+        return $this;
+    }
+
+    public function requiresMultiFactorAuthentication(bool | Closure $condition = true): static
+    {
+        $this->isMultiFactorAuthenticationRequired = $condition;
 
         return $this;
     }
@@ -259,7 +302,17 @@ trait HasAuth
 
     public function isEmailVerificationRequired(): bool
     {
-        return $this->isEmailVerificationRequired;
+        return (bool) $this->evaluate($this->isEmailVerificationRequired);
+    }
+
+    public function hasMultiFactorAuthentication(): bool
+    {
+        return ! empty($this->getMultiFactorAuthenticationProviders());
+    }
+
+    public function isMultiFactorAuthenticationRequired(): bool
+    {
+        return $this->isMultiFactorAuthenticationRequired;
     }
 
     public function hasProfile(): bool
@@ -294,9 +347,31 @@ trait HasAuth
         return $this->generateRouteName('auth.email-verification.prompt');
     }
 
+    /**
+     * @param  array<mixed>  $parameters
+     */
+    public function getSetUpRequiredMultiFactorAuthenticationUrl(array $parameters = []): ?string
+    {
+        if (! $this->hasMultiFactorAuthentication()) {
+            return null;
+        }
+
+        return route($this->getSetUpRequiredMultiFactorAuthenticationRouteName(), $parameters);
+    }
+
+    public function getSetUpRequiredMultiFactorAuthenticationRouteName(): string
+    {
+        return $this->generateRouteName('auth.multi-factor-authentication.set-up-required');
+    }
+
     public function getEmailVerifiedMiddleware(): string
     {
         return "{$this->getEmailVerifiedMiddlewareName()}:{$this->getEmailVerificationPromptRouteName()}";
+    }
+
+    public function getMultiFactorAuthenticationRequiredMiddleware(): string
+    {
+        return $this->getMultiFactorAuthenticationRequiredMiddlewareName();
     }
 
     /**
@@ -424,6 +499,11 @@ trait HasAuth
         return $this->evaluate($this->emailVerifiedMiddlewareName);
     }
 
+    public function getMultiFactorAuthenticationRequiredMiddlewareName(): string
+    {
+        return $this->evaluate($this->multiFactorAuthenticationRequiredMiddlewareName);
+    }
+
     /**
      * @return string | Closure | array<class-string, string> | null
      */
@@ -432,9 +512,22 @@ trait HasAuth
         return $this->emailVerificationRouteAction;
     }
 
+    /**
+     * @return string | Closure | array<class-string, string> | null
+     */
+    public function getSetUpRequiredMultiFactorAuthenticationRouteAction(): string | Closure | array | null
+    {
+        return $this->setUpRequiredMultiFactorAuthenticationRouteAction;
+    }
+
     public function getEmailVerificationPromptRouteSlug(): string
     {
         return Str::start($this->emailVerificationPromptRouteSlug, '/');
+    }
+
+    public function getSetUpRequiredMultiFactorAuthenticationRouteSlug(): string
+    {
+        return Str::start($this->setUpRequiredMultiFactorAuthenticationRouteSlug, '/');
     }
 
     public function getEmailVerificationRouteSlug(string $suffix): string
@@ -450,6 +543,11 @@ trait HasAuth
     public function getEmailVerificationRoutePrefix(): string
     {
         return Str::start($this->emailVerificationRoutePrefix, '/');
+    }
+
+    public function getMultiFactorAuthenticationRoutePrefix(): string
+    {
+        return Str::start($this->multiFactorAuthenticationRoutePrefix, '/');
     }
 
     public function getEmailChangeVerificationRoutePrefix(): string
@@ -563,16 +661,21 @@ trait HasAuth
 
     /**
      * @param  array<MultiFactorAuthenticationProvider>  $providers
+     * @param  string | Closure | array<class-string, string> | null  $setUpRequiredAction
      */
-    public function multiFactorAuthentication(array | MultiFactorAuthenticationProvider $providers): static
+    public function multiFactorAuthentication(array | MultiFactorAuthenticationProvider $providers, string | Closure | array | null $setUpRequiredAction = SetUpRequiredMultiFactorAuthentication::class, bool | Closure $isRequired = false): static
     {
-        $this->multiFactorAuthenticationProviders = Arr::wrap($providers);
+        $this->multiFactorAuthenticationProviders = Collection::wrap($providers)
+            ->mapWithKeys(fn (MultiFactorAuthenticationProvider $provider): array => [$provider->getId() => $provider])
+            ->all();
+        $this->setUpRequiredMultiFactorAuthenticationRouteAction = $setUpRequiredAction;
+        $this->requiresMultiFactorAuthentication($isRequired);
 
         return $this;
     }
 
     /**
-     * @return array<MultiFactorAuthenticationProvider>
+     * @return array<string, MultiFactorAuthenticationProvider>
      */
     public function getMultiFactorAuthenticationProviders(): array
     {

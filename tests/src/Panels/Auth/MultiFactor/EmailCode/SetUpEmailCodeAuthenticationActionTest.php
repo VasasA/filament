@@ -28,9 +28,9 @@ it('can generate a secret when the action is mounted', function () {
 
     $livewire = livewire(EditProfile::class)
         ->mountAction(TestAction::make('setUpEmailCodeAuthentication')
-            ->schemaComponent('content.email_code.setUpEmailCodeAuthenticationAction'))
+            ->schemaComponent('content.email_code'))
         ->assertActionMounted(TestAction::make('setUpEmailCodeAuthentication')
-            ->schemaComponent('content.email_code.setUpEmailCodeAuthenticationAction')
+            ->schemaComponent('content.email_code')
             ->arguments(function (array $actualArguments): bool {
                 $encrypted = decrypt($actualArguments['encrypted']);
 
@@ -70,7 +70,7 @@ it('can save the secret to the user when the action is submitted', function () {
 
     $livewire = livewire(EditProfile::class)
         ->mountAction(TestAction::make('setUpEmailCodeAuthentication')
-            ->schemaComponent('content.email_code.setUpEmailCodeAuthenticationAction'));
+            ->schemaComponent('content.email_code'));
 
     $encryptedActionArguments = decrypt($livewire->instance()->mountedActions[0]['arguments']['encrypted']);
     $secret = $encryptedActionArguments['secret'];
@@ -88,11 +88,39 @@ it('can save the secret to the user when the action is submitted', function () {
 });
 
 it('can resend the code to the user', function () {
+    $this->travelTo(now()->subMinute());
+
     $livewire = livewire(EditProfile::class)
         ->mountAction(TestAction::make('setUpEmailCodeAuthentication')
-            ->schemaComponent('content.email_code.setUpEmailCodeAuthenticationAction'));
+            ->schemaComponent('content.email_code'));
 
     Notification::assertSentTimes(VerifyEmailCodeAuthentication::class, 1);
+
+    $this->travelBack();
+
+    $livewire
+        ->callAction(TestAction::make('resend')
+            ->schemaComponent('mountedActionSchema0.code'));
+
+    Notification::assertSentTimes(VerifyEmailCodeAuthentication::class, 2);
+});
+
+it('can resend the code to the user more than once per minute', function () {
+    $this->travelTo(now()->subMinute());
+
+    $livewire = livewire(EditProfile::class)
+        ->mountAction(TestAction::make('setUpEmailCodeAuthentication')
+            ->schemaComponent('content.email_code'));
+
+    Notification::assertSentTimes(VerifyEmailCodeAuthentication::class, 1);
+
+    $livewire
+        ->callAction(TestAction::make('resend')
+            ->schemaComponent('mountedActionSchema0.code'));
+
+    Notification::assertSentTimes(VerifyEmailCodeAuthentication::class, 1);
+
+    $this->travelBack();
 
     $livewire
         ->callAction(TestAction::make('resend')
@@ -114,7 +142,7 @@ it('will not set up authentication when an invalid code is used', function () {
 
     $livewire = livewire(EditProfile::class)
         ->mountAction(TestAction::make('setUpEmailCodeAuthentication')
-            ->schemaComponent('content.email_code.setUpEmailCodeAuthenticationAction'));
+            ->schemaComponent('content.email_code'));
 
     $encryptedActionArguments = decrypt($livewire->instance()->mountedActions[0]['arguments']['encrypted']);
     $secret = $encryptedActionArguments['secret'];
@@ -144,7 +172,7 @@ test('codes are required', function () {
 
     livewire(EditProfile::class)
         ->mountAction(TestAction::make('setUpEmailCodeAuthentication')
-            ->schemaComponent('content.email_code.setUpEmailCodeAuthenticationAction'))
+            ->schemaComponent('content.email_code'))
         ->setActionData(['code' => ''])
         ->callMountedAction()
         ->assertHasActionErrors([
@@ -171,7 +199,7 @@ test('codes must be 6 digits', function () {
 
     $livewire = livewire(EditProfile::class)
         ->mountAction(TestAction::make('setUpEmailCodeAuthentication')
-            ->schemaComponent('content.email_code.setUpEmailCodeAuthenticationAction'));
+            ->schemaComponent('content.email_code'));
 
     $encryptedActionArguments = decrypt($livewire->instance()->mountedActions[0]['arguments']['encrypted']);
     $secret = $encryptedActionArguments['secret'];

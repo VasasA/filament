@@ -50,7 +50,7 @@
                 'max-w-sm rounded-xl bg-white shadow-lg ring-1 dark:bg-gray-900',
                 match ($color) {
                     'gray' => 'ring-gray-950/5 dark:ring-white/10',
-                    default => 'fi-color-custom ring-custom-600/20 dark:ring-custom-400/30',
+                    default => 'fi-color ring-color-600/20 dark:ring-color-400/30',
                 },
                 is_string($color) ? 'fi-color-' . $color : null,
                 'fi-status-' . $status => $status,
@@ -70,7 +70,7 @@
             'flex w-full gap-3 p-4',
             match ($color) {
                 'gray' => null,
-                default => 'bg-custom-50 dark:bg-custom-400/10',
+                default => 'bg-color-50 dark:bg-color-400/10',
             },
         ])
     >

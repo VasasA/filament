@@ -9,23 +9,19 @@ use Filament\Actions\Action;
 use Filament\Auth\Notifications\VerifyEmail;
 use Filament\Facades\Filament;
 use Filament\Notifications\Notification;
-use Filament\Pages\Auth\EmailVerification\view;
 use Filament\Pages\SimplePage;
+use Filament\Schemas\Components\Text;
 use Filament\Schemas\Schema;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\HtmlString;
 
 /**
- * @property-read Schema $form
+ * @property-read Action $resendNotificationAction
  */
 class EmailVerificationPrompt extends SimplePage
 {
     use WithRateLimiting;
-
-    /**
-     * @var view-string
-     */
-    protected static string $view = 'filament-panels::auth.pages.email-verification.email-verification-prompt';
 
     public function mount(): void
     {
@@ -65,6 +61,7 @@ class EmailVerificationPrompt extends SimplePage
         return Action::make('resendNotification')
             ->link()
             ->label(__('filament-panels::auth/pages/email-verification/email-verification-prompt.actions.resend_notification.label') . '.')
+            ->size('sm')
             ->action(function (): void {
                 try {
                     $this->rateLimit(2);
@@ -105,5 +102,20 @@ class EmailVerificationPrompt extends SimplePage
     public function getHeading(): string | Htmlable
     {
         return __('filament-panels::auth/pages/email-verification/email-verification-prompt.heading');
+    }
+
+    public function content(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                Text::make(__('filament-panels::auth/pages/email-verification/email-verification-prompt.messages.notification_sent', [
+                    'email' => filament()->auth()->user()->getEmailForVerification(),
+                ])),
+                Text::make(new HtmlString(
+                    __('filament-panels::auth/pages/email-verification/email-verification-prompt.messages.notification_not_received') .
+                    ' ' .
+                    $this->resendNotificationAction->toHtml(),
+                )),
+            ]);
     }
 }

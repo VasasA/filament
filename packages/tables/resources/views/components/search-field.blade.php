@@ -23,7 +23,7 @@
 
     <x-filament::input.wrapper
         inline-prefix
-        prefix-icon="heroicon-m-magnifying-glass"
+        :prefix-icon="\Filament\Support\Icons\Heroicon::MagnifyingGlass"
         prefix-icon-alias="tables::search-field"
         :wire:target="$wireModel"
     >
@@ -32,6 +32,7 @@
                 (new ComponentAttributeBag)->merge([
                     'autocomplete' => 'off',
                     'inlinePrefix' => true,
+                    'maxlength' => 1000,
                     'placeholder' => $placeholder,
                     'type' => 'search',
                     'wire:key' => $this->getId() . '.table.' . $wireModel . '.field.input',

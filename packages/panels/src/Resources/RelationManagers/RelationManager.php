@@ -2,6 +2,7 @@
 
 namespace Filament\Resources\RelationManagers;
 
+use BackedEnum;
 use Closure;
 use Filament\Actions;
 use Filament\Actions\Action;
@@ -52,7 +53,7 @@ class RelationManager extends Component implements Actions\Contracts\HasActions,
     /**
      * @var view-string
      */
-    protected static string $view = 'filament-panels::resources.relation-manager';
+    protected string $view = 'filament-panels::resources.relation-manager';
 
     #[Locked]
     public Model $ownerRecord;
@@ -92,7 +93,7 @@ class RelationManager extends Component implements Actions\Contracts\HasActions,
 
     protected static ?string $title = null;
 
-    protected static ?string $icon = null;
+    protected static string | BackedEnum | null $icon = null;
 
     protected static IconPosition $iconPosition = IconPosition::Before;
 
@@ -136,7 +137,7 @@ class RelationManager extends Component implements Actions\Contracts\HasActions,
 
     public function render(): View
     {
-        return view(static::$view, $this->getViewData());
+        return view($this->view, $this->getViewData());
     }
 
     /**
@@ -200,14 +201,14 @@ class RelationManager extends Component implements Actions\Contracts\HasActions,
         return $this->ownerRecord;
     }
 
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
-        return $form;
+        return $schema;
     }
 
-    public function infolist(Schema $infolist): Schema
+    public function infolist(Schema $schema): Schema
     {
-        return $infolist;
+        return $schema;
     }
 
     public function isReadOnly(): bool

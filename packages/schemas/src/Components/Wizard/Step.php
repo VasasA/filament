@@ -2,6 +2,7 @@
 
 namespace Filament\Schemas\Components\Wizard;
 
+use BackedEnum;
 use Closure;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Contracts\CanConcealComponents;
@@ -15,14 +16,14 @@ class Step extends Component implements CanConcealComponents
 
     protected string | Closure | null $description = null;
 
-    protected string | Closure | null $icon = null;
+    protected string | BackedEnum | Closure | null $icon = null;
 
-    protected string | Closure | null $completedIcon = null;
+    protected string | BackedEnum | Closure | null $completedIcon = null;
 
     /**
      * @var view-string
      */
-    protected string $view = 'filament-schema::components.wizard.step';
+    protected string $view = 'filament-schemas::components.wizard.step';
 
     final public function __construct(string $label)
     {
@@ -75,14 +76,14 @@ class Step extends Component implements CanConcealComponents
         return $this;
     }
 
-    public function icon(string | Closure | null $icon): static
+    public function icon(string | BackedEnum | Closure | null $icon): static
     {
         $this->icon = $icon;
 
         return $this;
     }
 
-    public function completedIcon(string | Closure | null $icon): static
+    public function completedIcon(string | BackedEnum | Closure | null $icon): static
     {
         $this->completedIcon = $icon;
 
@@ -104,12 +105,12 @@ class Step extends Component implements CanConcealComponents
         return $this->evaluate($this->description);
     }
 
-    public function getIcon(): ?string
+    public function getIcon(): string | BackedEnum | null
     {
         return $this->evaluate($this->icon);
     }
 
-    public function getCompletedIcon(): ?string
+    public function getCompletedIcon(): string | BackedEnum | null
     {
         return $this->evaluate($this->completedIcon);
     }

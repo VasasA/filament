@@ -103,8 +103,6 @@ trait InteractsWithActions
             return null;
         }
 
-        $this->syncActionModals();
-
         if (($actionComponent = $action->getSchemaComponent()) instanceof ExposesStateToActionData) {
             foreach ($actionComponent->getChildComponentContainers() as $actionComponentChildComponentContainer) {
                 $actionComponentChildComponentContainer->validate();
@@ -148,6 +146,8 @@ trait InteractsWithActions
         if (! $this->mountedActionShouldOpenModal(mountedAction: $action)) {
             return $this->callMountedAction();
         }
+
+        $this->syncActionModals();
 
         $this->resetErrorBag();
 
@@ -211,7 +211,7 @@ trait InteractsWithActions
             if ($this->mountedActionHasSchema(mountedAction: $action)) {
                 $action->callBeforeFormValidated();
 
-                $schema->getState(afterValidate: function (array $state) use ($action, $schemaState) {
+                $schema->getState(afterValidate: function (array $state) use ($action, $schemaState): void {
                     $action->callAfterFormValidated();
 
                     $action->formData([
@@ -439,7 +439,7 @@ trait InteractsWithActions
     {
         if (count($parentActions)) {
             $parentAction = Arr::last($parentActions);
-            $resolvedAction = $parentAction->getMountableModalAction($action['name']);
+            $resolvedAction = $parentAction->getModalAction($action['name']);
 
             if (! $resolvedAction) {
                 throw new ActionNotResolvableException("Action [{$action['name']}] was not found for action [{$parentAction->getName()}].");
@@ -477,7 +477,7 @@ trait InteractsWithActions
     protected function resolveTableAction(array $action, array $parentActions): Action
     {
         if (! ($this instanceof HasTable)) {
-            throw new ActionNotResolvableException('Failed to resolve table action for Livewire component without the ' . HasTable::class . ' trait.');
+            throw new ActionNotResolvableException('Failed to resolve table action for Livewire component without the [' . HasTable::class . '] trait.');
         }
 
         $resolvedAction = null;
@@ -505,22 +505,29 @@ trait InteractsWithActions
     protected function resolveSchemaComponentAction(array $action, array $parentActions): Action
     {
         if (! $this instanceof HasSchemas) {
-            throw new ActionNotResolvableException('Failed to resolve action schema component for Livewire component without the ' . InteractsWithSchemas::class . ' trait.');
+            throw new ActionNotResolvableException('Failed to resolve action schema for Livewire component without the [' . InteractsWithSchemas::class . '] trait.');
         }
 
-        $component = $this->getSchemaComponent($action['context']['schemaComponent']);
+        $key = $action['context']['schemaComponent'];
 
-        if (! $component) {
-            throw new ActionNotResolvableException("Schema component [{$action['context']['schemaComponent']}] not found.");
+        $schemaName = (string) str($key)->before('.');
+
+        $schema = $this->getSchema($schemaName);
+
+        if (! $schema) {
+            throw new ActionNotResolvableException("Schema [{$schemaName}] not found.");
         }
 
-        $componentAction = $component->getAction($action['name']);
+        $resolvedAction = $schema->getAction(
+            $action['name'],
+            str($key)->contains('.') ? (string) str($key)->after('.') : null,
+        );
 
-        if (! $componentAction) {
-            throw new ActionNotResolvableException("Action [{$action['name']}] not found on schema component [{$action['context']['schemaComponent']}].");
+        if (! $resolvedAction) {
+            throw new ActionNotResolvableException("Action [{$action['name']}] not found in schema at [{$action['context']['schemaComponent']}].");
         }
 
-        return $componentAction;
+        return $resolvedAction;
     }
 
     /**
@@ -534,26 +541,6 @@ trait InteractsWithActions
         );
 
         return Arr::last($this->resolveActions($actions));
-    }
-
-    /**
-     * @param  array<string>  $modalActionNames
-     */
-    protected function getMountableModalActionFromAction(Action $action, array $modalActionNames): ?Action
-    {
-        foreach ($modalActionNames as $modalActionName) {
-            $action = $action->getMountableModalAction($modalActionName);
-
-            if (! $action) {
-                return null;
-            }
-        }
-
-        if (! $action instanceof Action) {
-            return null;
-        }
-
-        return $action;
     }
 
     protected function getMountedActionSchema(?int $actionNestingIndex = null, ?Action $mountedAction = null): ?Schema
@@ -580,7 +567,8 @@ trait InteractsWithActions
                         ->take($actionNestingIndex + 1)
                         ->pluck('name')
                         ->implode('.'),
-                ),
+                )
+                ->rootHeadingLevel(3),
         );
     }
 

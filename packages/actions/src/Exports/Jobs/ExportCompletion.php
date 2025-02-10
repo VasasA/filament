@@ -47,7 +47,7 @@ class ExportCompletion implements ShouldQueue
     {
         $this->export->touch('completed_at');
 
-        if (! $this->export->user instanceof Authenticatable) {
+        if (! $this->export->user instanceof Authenticatable) { /** @phpstan-ignore instanceof.alwaysTrue */
             return;
         }
 

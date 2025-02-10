@@ -6,8 +6,6 @@ return [
 
     'heading' => 'Sign in',
 
-    'multi_factor_heading' => 'Verify your identity',
-
     'actions' => [
 
         'register' => [
@@ -45,12 +43,24 @@ return [
 
     ],
 
-    'multi_factor_form' => [
+    'multi_factor' => [
 
-        'actions' => [
+        'heading' => 'Verify your identity',
 
-            'authenticate' => [
-                'label' => 'Confirm sign in',
+        'subheading' => 'To continue signing in, you need to verify your identity.',
+
+        'form' => [
+
+            'provider' => [
+                'label' => 'How would you like to verify?',
+            ],
+
+            'actions' => [
+
+                'authenticate' => [
+                    'label' => 'Confirm sign in',
+                ],
+
             ],
 
         ],

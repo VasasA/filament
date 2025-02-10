@@ -101,7 +101,7 @@
             @if ($isSearchable)
                 <x-filament::input.wrapper
                     inline-prefix
-                    prefix-icon="heroicon-m-magnifying-glass"
+                    :prefix-icon="\Filament\Support\Icons\Heroicon::MagnifyingGlass"
                     prefix-icon-alias="forms:components.checkbox-list.search-field"
                     class="mb-4"
                 >
@@ -197,7 +197,7 @@
 
                         <div class="grid text-sm leading-6">
                             <span
-                                class="fi-fo-checkbox-list-option-label overflow-hidden break-words font-medium text-gray-950 dark:text-white"
+                                class="fi-fo-checkbox-list-option-label overflow-hidden font-medium break-words text-gray-950 dark:text-white"
                             >
                                 @if ($isHtmlAllowed())
                                     {!! $label !!}

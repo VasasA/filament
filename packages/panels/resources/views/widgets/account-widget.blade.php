@@ -9,7 +9,7 @@
 
             <div class="flex-1">
                 <h2
-                    class="grid flex-1 text-base font-semibold leading-6 text-gray-950 dark:text-white"
+                    class="grid flex-1 text-base leading-6 font-semibold text-gray-950 dark:text-white"
                 >
                     {{ __('filament-panels::widgets/account-widget.welcome', ['app' => config('app.name')]) }}
                 </h2>
@@ -28,7 +28,7 @@
 
                 <x-filament::button
                     color="gray"
-                    icon="heroicon-m-arrow-left-on-rectangle"
+                    :icon="\Filament\Support\Icons\Heroicon::ArrowLeftOnRectangle"
                     icon-alias="panels::widgets.account.logout-button"
                     labeled-from="sm"
                     tag="button"

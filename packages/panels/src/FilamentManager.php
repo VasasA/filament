@@ -21,7 +21,7 @@ use Filament\Navigation\NavigationGroup;
 use Filament\Navigation\NavigationItem;
 use Filament\Pages\Enums\SubNavigationPosition;
 use Filament\Support\Assets\Theme;
-use Filament\Support\Enums\MaxWidth;
+use Filament\Support\Enums\Width;
 use Filament\Support\Facades\FilamentAsset;
 use Filament\Support\Facades\FilamentView;
 use Filament\Widgets\Widget;
@@ -143,6 +143,14 @@ class FilamentManager
     public function getEmailVerificationPromptUrl(array $parameters = []): ?string
     {
         return $this->getCurrentOrDefaultPanel()->getEmailVerificationPromptUrl($parameters);
+    }
+
+    /**
+     * @param  array<mixed>  $parameters
+     */
+    public function getSetUpRequiredMultiFactorAuthenticationUrl(array $parameters = []): ?string
+    {
+        return $this->getCurrentOrDefaultPanel()->getSetUpRequiredMultiFactorAuthenticationUrl($parameters);
     }
 
     public function getEmailVerifiedMiddleware(): string
@@ -269,12 +277,12 @@ class FilamentManager
         return $this->getCurrentOrDefaultPanel()->getLogoutUrl($parameters);
     }
 
-    public function getMaxContentWidth(): MaxWidth | string | null
+    public function getMaxContentWidth(): Width | string | null
     {
         return $this->getCurrentOrDefaultPanel()->getMaxContentWidth();
     }
 
-    public function getSimplePageMaxContentWidth(): MaxWidth | string | null
+    public function getSimplePageMaxContentWidth(): Width | string | null
     {
         return $this->getCurrentOrDefaultPanel()->getSimplePageMaxContentWidth();
     }
@@ -647,6 +655,11 @@ class FilamentManager
         return $this->getCurrentOrDefaultPanel()->hasLazyLoadedDatabaseNotifications();
     }
 
+    public function hasMultiFactorAuthentication(): bool
+    {
+        return $this->getCurrentOrDefaultPanel()->hasMultiFactorAuthentication();
+    }
+
     public function hasEmailVerification(): bool
     {
         return $this->getCurrentOrDefaultPanel()->hasEmailVerification();
@@ -984,7 +997,7 @@ class FilamentManager
     }
 
     /**
-     * @return array<MultiFactorAuthenticationProvider>
+     * @return array<string, MultiFactorAuthenticationProvider>
      */
     public function getMultiFactorAuthenticationProviders(): array
     {

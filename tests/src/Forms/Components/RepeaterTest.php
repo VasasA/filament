@@ -4,6 +4,8 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 use Filament\Tests\Fixtures\Livewire\Livewire;
+use Filament\Tests\Fixtures\Models\Post;
+use Filament\Tests\Fixtures\Models\User;
 use Filament\Tests\TestCase;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -143,6 +145,40 @@ it('can remove items from a repeater', function () {
 
     $undoRepeaterFake();
 });
+
+it('loads a relationship', function () {
+    $user = User::factory()
+        ->has(Post::factory()->count(3))
+        ->create();
+
+    $componentContainer = Schema::make(Livewire::make())
+        ->statePath('data')
+        ->components([
+            (new Repeater('repeater'))
+                ->relationship('posts'),
+        ])
+        ->model($user);
+
+    $componentContainer->loadStateFromRelationships();
+
+    $componentContainer->saveRelationships();
+
+    expect($user->posts()->count())
+        ->toBe(3);
+});
+
+it('throws an exception for a missing relationship', function () {
+    $componentContainer = Schema::make(Livewire::make())
+        ->statePath('data')
+        ->components([
+            (new Repeater(Str::random()))
+                ->relationship('missing'),
+        ])
+        ->model(Post::factory()->create());
+
+    $componentContainer
+        ->saveRelationships();
+})->throws(Exception::class, 'The relationship [missing] does not exist on the model [Filament\Tests\Fixtures\Models\Post].');
 
 class TestComponentWithRepeater extends Livewire
 {

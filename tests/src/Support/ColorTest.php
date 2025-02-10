@@ -1,73 +1,53 @@
 <?php
 
 use Filament\Support\Colors\Color;
+use Filament\Support\Colors\ColorManager;
+use Filament\Support\Facades\FilamentColor;
+use Filament\Support\View\Components\Badge;
+use Filament\Support\View\Components\Button;
+use Filament\Support\View\Components\Contracts\HasColor;
+use Filament\Support\View\Components\Dropdown\Header as DropdownHeader;
+use Filament\Support\View\Components\Dropdown\Item as DropdownItem;
+use Filament\Support\View\Components\Dropdown\Item\Icon as DropdownItemIcon;
+use Filament\Support\View\Components\IconButton;
+use Filament\Support\View\Components\Input\Wrapper\Icon as InputWrapperIcon;
+use Filament\Support\View\Components\Link;
+use Filament\Support\View\Components\Modal\Icon as ModalIcon;
+use Filament\Support\View\Components\Section\Icon as SectionIcon;
+use Filament\Support\View\Components\Toggle;
+use Filament\Tables\View\Components\Columns\IconColumn\Icon as TableIconColumnIcon;
+use Filament\Tables\View\Components\Columns\Summarizers\Count\Icon as TableColumnCountSummarizerIcon;
+use Filament\Tables\View\Components\Columns\TextColumn\Item as TableTextColumnItem;
+use Filament\Tables\View\Components\Columns\TextColumn\Item\Icon as TableTextColumnItemIcon;
 use Filament\Tests\TestCase;
+use Filament\Widgets\View\Components\ChartWidget;
+use Filament\Widgets\View\Components\StatsOverviewWidget\Stat\Description as StatsOverviewWidgetStatDescription;
+use Filament\Widgets\View\Components\StatsOverviewWidget\Stat\StatsOverviewWidgetStatChart;
 use Illuminate\Support\Str;
 
 uses(TestCase::class);
 
-it('generates colors from a HEX value', function () {
-    expect(Color::hex('#49D359'))
-        ->toBe([
-            50 => '246, 253, 247',
-            100 => '237, 251, 238',
-            200 => '210, 244, 214',
-            300 => '182, 237, 189',
-            400 => '128, 224, 139',
-            500 => '73, 211, 89',
-            600 => '66, 190, 80',
-            700 => '55, 158, 67',
-            800 => '44, 127, 53',
-            900 => '36, 103, 44',
-            950 => '22, 63, 27',
-        ])
-        ->and(Color::hex('#FF0000'))
-        ->toBe([
-            50 => '255, 242, 242',
-            100 => '255, 230, 230',
-            200 => '255, 191, 191',
-            300 => '255, 153, 153',
-            400 => '255, 77, 77',
-            500 => '255, 0, 0',
-            600 => '230, 0, 0',
-            700 => '191, 0, 0',
-            800 => '153, 0, 0',
-            900 => '125, 0, 0',
-            950 => '77, 0, 0',
-        ]);
-});
+it('generates colors from a HEX value', function (string $color) {
+    expect(Color::generatePalette($color))
+        ->toMatchSnapshot();
+})->with([
+    '#49D359',
+    '#8A2BE2',
+    '#A52A2A',
+    '#000000',
+    '#FFFFFF',
+]);
 
-it('generates colors from an RGB value', function () {
-    expect(Color::rgb('rgb(73, 211, 89)'))
-        ->toBe([
-            50 => '246, 253, 247',
-            100 => '237, 251, 238',
-            200 => '210, 244, 214',
-            300 => '182, 237, 189',
-            400 => '128, 224, 139',
-            500 => '73, 211, 89',
-            600 => '66, 190, 80',
-            700 => '55, 158, 67',
-            800 => '44, 127, 53',
-            900 => '36, 103, 44',
-            950 => '22, 63, 27',
-        ])
-        ->and(Color::rgb('rgb(255, 0, 0)'))
-        ->toBe([
-            50 => '255, 242, 242',
-            100 => '255, 230, 230',
-            200 => '255, 191, 191',
-            300 => '255, 153, 153',
-            400 => '255, 77, 77',
-            500 => '255, 0, 0',
-            600 => '230, 0, 0',
-            700 => '191, 0, 0',
-            800 => '153, 0, 0',
-            900 => '125, 0, 0',
-            950 => '77, 0, 0',
-        ]);
-
-});
+it('generates colors from an RGB value', function (string $color) {
+    expect(Color::generatePalette($color))
+        ->toMatchSnapshot();
+})->with([
+    'rgb(128, 8, 8)',
+    'rgb(93, 255, 2)',
+    'rgb(243, 243, 21)',
+    'rgb(0, 0, 0)',
+    'rgb(255, 255, 255)',
+]);
 
 it('returns all colors', function () {
     $colors = [];
@@ -79,3 +59,30 @@ it('returns all colors', function () {
     expect(Color::all())
         ->toBe($colors);
 });
+
+it('generates component classes', function (string | HasColor $component, string $color) {
+    expect(FilamentColor::getComponentClasses($component, $color))
+        ->toMatchSnapshot();
+})
+    ->with([
+        'badge' => Badge::class,
+        'button' => new Button(isOutlined: false),
+        'outlined button' => new Button(isOutlined: true),
+        'chart widget' => ChartWidget::class,
+        'dropdown header' => DropdownHeader::class,
+        'dropdown item icon' => DropdownItemIcon::class,
+        'dropdown item' => DropdownItem::class,
+        'icon button' => IconButton::class,
+        'input wrapper icon' => InputWrapperIcon::class,
+        'link' => Link::class,
+        'modal icon' => ModalIcon::class,
+        'section icon' => SectionIcon::class,
+        'stats overview widget stat description' => StatsOverviewWidgetStatDescription::class,
+        'stats overview widget stat chart' => StatsOverviewWidgetStatChart::class,
+        'table column count summarizer icon' => TableColumnCountSummarizerIcon::class,
+        'table icon column icon' => TableIconColumnIcon::class,
+        'table text column item' => TableTextColumnItem::class,
+        'table text column item icon' => TableTextColumnItemIcon::class,
+        'toggle' => Toggle::class,
+    ])
+    ->with(fn (): array => array_keys(app(ColorManager::class)->getColors()));

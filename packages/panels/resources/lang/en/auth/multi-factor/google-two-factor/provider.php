@@ -5,16 +5,27 @@ return [
     'management_schema' => [
 
         'actions' => [
-            'label' => 'Two factor authentication app',
+
+            'label' => 'Authenticator app',
+
+            'below_content' => 'Use a secure app to generate a temporary code for login verification.',
+
+            'messages' => [
+                'enabled' => 'Enabled',
+                'disabled' => 'Disabled',
+            ],
+
         ],
 
     ],
 
     'login_form' => [
 
+        'label' => 'Use a code from your authenticator app',
+
         'code' => [
 
-            'label' => 'Enter a code from the app',
+            'label' => 'Enter the 6-digit code from the authenticator app',
 
             'validation_attribute' => 'code',
 

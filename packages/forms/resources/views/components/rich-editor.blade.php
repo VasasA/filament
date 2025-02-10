@@ -7,385 +7,325 @@
 @endphp
 
 <x-dynamic-component :component="$getFieldWrapperView()" :field="$field">
-    @if ($isDisabled())
-        <div
-            x-data="{
-                state: $wire.{{ $applyStateBindingModifiers("\$entangle('{$statePath}')") }},
-            }"
-            x-html="state"
-            class="fi-fo-rich-editor fi-disabled prose block w-full max-w-none rounded-lg bg-gray-50 px-3 py-3 text-gray-500 shadow-sm ring-1 ring-gray-950/10 dark:prose-invert dark:bg-transparent dark:text-gray-400 dark:ring-white/10 sm:text-sm"
-        ></div>
-    @else
+    <div
+        @if (FilamentView::hasSpaMode())
+            {{-- format-ignore-start --}}x-load="visible || event (x-modal-opened)"{{-- format-ignore-end --}}
+        @else
+            x-load
+        @endif
+        x-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('rich-editor', 'filament/forms') }}"
+        x-data="richEditorFormComponent({
+                    key: @js($key),
+                    livewireId: @js($this->getId()),
+                    state: $wire.{{ $applyStateBindingModifiers("\$entangle('{$statePath}')", isOptimisticallyLive: false) }},
+                    statePath: @js($statePath),
+                    uploadingFileMessage: @js($getUploadingFileMessage()),
+                })"
+        x-cloak
+        x-bind:class="{
+            'pointer-events-none opacity-50 cursor-wait': isUploadingFile,
+        }"
+    >
         <x-filament::input.wrapper
             :valid="! $errors->has($statePath)"
             :attributes="
                 \Filament\Support\prepare_inherited_attributes($getExtraAttributeBag())
-                    ->class(['fi-fo-rich-editor max-w-full overflow-x-auto'])
+                    ->class(['fi-fo-rich-editor'])
             "
         >
             <div
-                @if (FilamentView::hasSpaMode())
-                    {{-- format-ignore-start --}}x-load="visible || event (x-modal-opened)"{{-- format-ignore-end --}}
-                @else
-                    x-load
-                @endif
-                x-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('rich-editor', 'filament/forms') }}"
-                x-data="richEditorFormComponent({
-                            state: $wire.{{ $applyStateBindingModifiers("\$entangle('{$statePath}')", isOptimisticallyLive: false) }},
-                        })"
-                x-on:trix-attachment-add="
-                    if (! $event.attachment.file) return
-
-                    let attachment = $event.attachment
-
-                    $wire.upload(`componentFileAttachments.{{ $key }}`, attachment.file, () => {
-                        $wire
-                            .callSchemaComponentMethod('{{ $key }}', 'saveUploadedFileAttachment')
-                            .then((url) => {
-                                attachment.setAttributes({
-                                    url: url,
-                                    href: url,
-                                })
-                            })
-                    })
-                "
-                x-on:trix-change="
-                    let value = $event.target.value
-
-                    $nextTick(() => {
-                        if (! $refs.trix) {
-                            return
-                        }
-
-                        state = value
-                    })
-                "
-                @if ($isLiveDebounced())
-                    x-on:trix-change.debounce.{{ $getLiveDebounce() }}="
-                        $nextTick(() => {
-                            if (! $refs.trix) {
-                                return
-                            }
-
-                            $wire.call('$refresh')
-                        })
-                    "
-                @endif
-                @if (! $hasToolbarButton('attachFiles'))
-                    x-on:trix-file-accept="$event.preventDefault()"
-                @endif
-                {{ $getExtraAlpineAttributeBag() }}
+                @class([
+                    'fi-fo-rich-editor-toolbar relative flex flex-col gap-x-3 border-b border-gray-100 px-2.5 py-2 dark:border-white/10',
+                    'hidden' => ! count($getToolbarButtons()),
+                ])
             >
-                <input
-                    id="trix-value-{{ $id }}"
-                    x-ref="trixValue"
-                    type="hidden"
-                />
-
-                <trix-toolbar
-                    id="trix-toolbar-{{ $id }}"
-                    @class([
-                        'fi-fo-rich-editor-toolbar relative flex flex-col gap-x-3 border-b border-gray-100 px-2.5 py-2 dark:border-white/10',
-                        'hidden' => ! count($getToolbarButtons()),
-                    ])
-                >
-                    <div class="flex gap-x-3 overflow-x-auto">
-                        @if ($hasToolbarButton(['bold', 'italic', 'underline', 'strike', 'link']))
-                            <x-filament-forms::rich-editor.toolbar.group
-                                data-trix-button-group="text-tools"
-                            >
-                                @if ($hasToolbarButton('bold'))
-                                    <x-filament-forms::rich-editor.toolbar.button
-                                        data-trix-attribute="bold"
-                                        data-trix-key="b"
-                                        title="{{ __('filament-forms::components.rich_editor.toolbar_buttons.bold') }}"
-                                        tabindex="-1"
-                                    >
-                                        <x-filament::icon
-                                            icon="heroicon-m-bold"
-                                            class="h-5 w-5"
-                                        />
-                                    </x-filament-forms::rich-editor.toolbar.button>
-                                @endif
-
-                                @if ($hasToolbarButton('italic'))
-                                    <x-filament-forms::rich-editor.toolbar.button
-                                        data-trix-attribute="italic"
-                                        data-trix-key="i"
-                                        title="{{ __('filament-forms::components.rich_editor.toolbar_buttons.italic') }}"
-                                        tabindex="-1"
-                                    >
-                                        <x-filament::icon
-                                            icon="heroicon-m-italic"
-                                            class="h-5 w-5"
-                                        />
-                                    </x-filament-forms::rich-editor.toolbar.button>
-                                @endif
-
-                                @if ($hasToolbarButton('underline'))
-                                    <x-filament-forms::rich-editor.toolbar.button
-                                        data-trix-attribute="underline"
-                                        data-trix-key="u"
-                                        title="{{ __('filament-forms::components.rich_editor.toolbar_buttons.underline') }}"
-                                        tabindex="-1"
-                                    >
-                                        <x-filament::icon
-                                            icon="heroicon-m-underline"
-                                            class="h-5 w-5"
-                                        />
-                                    </x-filament-forms::rich-editor.toolbar.button>
-                                @endif
-
-                                @if ($hasToolbarButton('strike'))
-                                    <x-filament-forms::rich-editor.toolbar.button
-                                        data-trix-attribute="strike"
-                                        data-trix-key="s"
-                                        title="{{ __('filament-forms::components.rich_editor.toolbar_buttons.strike') }}"
-                                        tabindex="-1"
-                                    >
-                                        <x-filament::icon
-                                            icon="heroicon-m-strikethrough"
-                                            class="h-5 w-5"
-                                        />
-                                    </x-filament-forms::rich-editor.toolbar.button>
-                                @endif
-
-                                @if ($hasToolbarButton('link'))
-                                    <x-filament-forms::rich-editor.toolbar.button
-                                        data-trix-attribute="href"
-                                        data-trix-action="link"
-                                        data-trix-key="k"
-                                        title="{{ __('filament-forms::components.rich_editor.toolbar_buttons.link') }}"
-                                        tabindex="-1"
-                                    >
-                                        <x-filament::icon
-                                            icon="heroicon-m-link"
-                                            class="h-5 w-5"
-                                        />
-                                    </x-filament-forms::rich-editor.toolbar.button>
-                                @endif
-                            </x-filament-forms::rich-editor.toolbar.group>
-                        @endif
-
-                        @if ($hasToolbarButton(['h1', 'h2', 'h3']))
-                            <x-filament-forms::rich-editor.toolbar.group
-                                data-trix-button-group="heading-tools"
-                            >
-                                @if ($hasToolbarButton('h1'))
-                                    <x-filament-forms::rich-editor.toolbar.button
-                                        data-trix-attribute="heading1"
-                                        title="{{ __('filament-forms::components.rich_editor.toolbar_buttons.h1') }}"
-                                        tabindex="-1"
-                                    >
-                                        <x-filament::icon
-                                            icon="heroicon-m-h1"
-                                            class="h-5 w-5"
-                                        />
-                                    </x-filament-forms::rich-editor.toolbar.button>
-                                @endif
-
-                                @if ($hasToolbarButton('h2'))
-                                    <x-filament-forms::rich-editor.toolbar.button
-                                        data-trix-attribute="heading"
-                                        title="{{ __('filament-forms::components.rich_editor.toolbar_buttons.h2') }}"
-                                        tabindex="-1"
-                                    >
-                                        <x-filament::icon
-                                            icon="heroicon-m-h2"
-                                            class="h-5 w-5"
-                                        />
-                                    </x-filament-forms::rich-editor.toolbar.button>
-                                @endif
-
-                                @if ($hasToolbarButton('h3'))
-                                    <x-filament-forms::rich-editor.toolbar.button
-                                        data-trix-attribute="subHeading"
-                                        title="{{ __('filament-forms::components.rich_editor.toolbar_buttons.h3') }}"
-                                        tabindex="-1"
-                                    >
-                                        <x-filament::icon
-                                            icon="heroicon-m-h3"
-                                            class="h-5 w-5"
-                                        />
-                                    </x-filament-forms::rich-editor.toolbar.button>
-                                @endif
-                            </x-filament-forms::rich-editor.toolbar.group>
-                        @endif
-
-                        @if ($hasToolbarButton(['blockquote', 'codeBlock', 'bulletList', 'orderedList']))
-                            <x-filament-forms::rich-editor.toolbar.group
-                                data-trix-button-group="block-tools"
-                            >
-                                @if ($hasToolbarButton('blockquote'))
-                                    <x-filament-forms::rich-editor.toolbar.button
-                                        data-trix-attribute="quote"
-                                        title="{{ __('filament-forms::components.rich_editor.toolbar_buttons.blockquote') }}"
-                                        tabindex="-1"
-                                    >
-                                        <x-filament::icon
-                                            icon="heroicon-m-chat-bubble-bottom-center-text"
-                                            class="h-5 w-5"
-                                        />
-                                    </x-filament-forms::rich-editor.toolbar.button>
-                                @endif
-
-                                @if ($hasToolbarButton('codeBlock'))
-                                    <x-filament-forms::rich-editor.toolbar.button
-                                        data-trix-attribute="code"
-                                        title="{{ __('filament-forms::components.rich_editor.toolbar_buttons.code_block') }}"
-                                        tabindex="-1"
-                                    >
-                                        <x-filament::icon
-                                            icon="heroicon-m-code-bracket"
-                                            class="h-5 w-5"
-                                        />
-                                    </x-filament-forms::rich-editor.toolbar.button>
-                                @endif
-
-                                @if ($hasToolbarButton('bulletList'))
-                                    <x-filament-forms::rich-editor.toolbar.button
-                                        data-trix-attribute="bullet"
-                                        title="{{ __('filament-forms::components.rich_editor.toolbar_buttons.bullet_list') }}"
-                                        tabindex="-1"
-                                    >
-                                        <x-filament::icon
-                                            icon="heroicon-m-list-bullet"
-                                            class="h-5 w-5"
-                                        />
-                                    </x-filament-forms::rich-editor.toolbar.button>
-                                @endif
-
-                                @if ($hasToolbarButton('orderedList'))
-                                    <x-filament-forms::rich-editor.toolbar.button
-                                        data-trix-attribute="number"
-                                        title="{{ __('filament-forms::components.rich_editor.toolbar_buttons.ordered_list') }}"
-                                        tabindex="-1"
-                                    >
-                                        <x-filament::icon
-                                            icon="heroicon-m-numbered-list"
-                                            class="h-5 w-5"
-                                        />
-                                    </x-filament-forms::rich-editor.toolbar.button>
-                                @endif
-                            </x-filament-forms::rich-editor.toolbar.group>
-                        @endif
-
-                        @if ($hasToolbarButton('attachFiles'))
-                            <x-filament-forms::rich-editor.toolbar.group
-                                data-trix-button-group="file-tools"
-                            >
+                <div class="flex gap-x-3 overflow-x-auto">
+                    @if ($hasToolbarButton(['bold', 'italic', 'underline', 'strike', 'link']))
+                        <x-filament-forms::rich-editor.toolbar.group>
+                            @if ($hasToolbarButton('bold'))
                                 <x-filament-forms::rich-editor.toolbar.button
-                                    data-trix-action="attachFiles"
-                                    title="{{ __('filament-forms::components.rich_editor.toolbar_buttons.attach_files') }}"
+                                    type="bold"
+                                    x-on:click="getEditor().chain().focus().toggleBold().run()"
+                                    :title="__('filament-forms::components.rich_editor.toolbar_buttons.bold')"
                                     tabindex="-1"
                                 >
                                     <x-filament::icon
-                                        icon="heroicon-m-photo"
+                                        :icon="\Filament\Support\Icons\Heroicon::Bold"
                                         class="h-5 w-5"
                                     />
                                 </x-filament-forms::rich-editor.toolbar.button>
-                            </x-filament-forms::rich-editor.toolbar.group>
-                        @endif
+                            @endif
 
-                        @if ($hasToolbarButton(['undo', 'redo']))
-                            <x-filament-forms::rich-editor.toolbar.group
-                                data-trix-button-group="history-tools"
+                            @if ($hasToolbarButton('italic'))
+                                <x-filament-forms::rich-editor.toolbar.button
+                                    type="italic"
+                                    x-on:click="getEditor().chain().focus().toggleItalic().run()"
+                                    title="{{ __('filament-forms::components.rich_editor.toolbar_buttons.italic') }}"
+                                    tabindex="-1"
+                                >
+                                    <x-filament::icon
+                                        :icon="\Filament\Support\Icons\Heroicon::Italic"
+                                        class="h-5 w-5"
+                                    />
+                                </x-filament-forms::rich-editor.toolbar.button>
+                            @endif
+
+                            @if ($hasToolbarButton('underline'))
+                                <x-filament-forms::rich-editor.toolbar.button
+                                    type="underline"
+                                    x-on:click="getEditor().chain().focus().toggleUnderline().run()"
+                                    title="{{ __('filament-forms::components.rich_editor.toolbar_buttons.underline') }}"
+                                    tabindex="-1"
+                                >
+                                    <x-filament::icon
+                                        :icon="\Filament\Support\Icons\Heroicon::Underline"
+                                        class="h-5 w-5"
+                                    />
+                                </x-filament-forms::rich-editor.toolbar.button>
+                            @endif
+
+                            @if ($hasToolbarButton('strike'))
+                                <x-filament-forms::rich-editor.toolbar.button
+                                    type="strike"
+                                    x-on:click="getEditor().chain().focus().toggleStrike().run()"
+                                    title="{{ __('filament-forms::components.rich_editor.toolbar_buttons.strike') }}"
+                                    tabindex="-1"
+                                >
+                                    <x-filament::icon
+                                        :icon="\Filament\Support\Icons\Heroicon::Strikethrough"
+                                        class="h-5 w-5"
+                                    />
+                                </x-filament-forms::rich-editor.toolbar.button>
+                            @endif
+
+                            @if ($hasToolbarButton('sub'))
+                                <x-filament-forms::rich-editor.toolbar.button
+                                    type="sub"
+                                    x-on:click="getEditor().chain().focus().toggleSubscript().run()"
+                                    title="{{ __('filament-forms::components.rich_editor.toolbar_buttons.sub') }}"
+                                    tabindex="-1"
+                                >
+                                    <svg
+                                        class="-mx-4 h-4 dark:fill-current"
+                                        aria-hidden="true"
+                                        focusable="false"
+                                        data-prefix="fas"
+                                        data-icon="sub"
+                                        role="img"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 0 512 512"
+                                    >
+                                        <path
+                                            fill="currentColor"
+                                            d="M496 448h-16V304a16 16 0 0 0-16-16h-48a16 16 0 0 0-14.29 8.83l-16 32A16 16 0 0 0 400 352h16v96h-16a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h96a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zM336 64h-67a16 16 0 0 0-13.14 6.87l-79.9 115-79.9-115A16 16 0 0 0 83 64H16A16 16 0 0 0 0 80v48a16 16 0 0 0 16 16h33.48l77.81 112-77.81 112H16a16 16 0 0 0-16 16v48a16 16 0 0 0 16 16h67a16 16 0 0 0 13.14-6.87l79.9-115 79.9 115A16 16 0 0 0 269 448h67a16 16 0 0 0 16-16v-48a16 16 0 0 0-16-16h-33.48l-77.81-112 77.81-112H336a16 16 0 0 0 16-16V80a16 16 0 0 0-16-16z"
+                                        />
+                                    </svg>
+                                </x-filament-forms::rich-editor.toolbar.button>
+                            @endif
+
+                            @if ($hasToolbarButton('sup'))
+                                <x-filament-forms::rich-editor.toolbar.button
+                                    type="sup"
+                                    x-on:click="getEditor().chain().focus().toggleSuperscript().run()"
+                                    title="{{ __('filament-forms::components.rich_editor.toolbar_buttons.sup') }}"
+                                    tabindex="-1"
+                                >
+                                    <svg
+                                        class="-mx-4 h-4 dark:fill-current"
+                                        aria-hidden="true"
+                                        focusable="false"
+                                        data-prefix="fas"
+                                        data-icon="sup"
+                                        role="img"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 0 512 512"
+                                    >
+                                        <path
+                                            fill="currentColor"
+                                            d="M496 160h-16V16a16 16 0 0 0-16-16h-48a16 16 0 0 0-14.29 8.83l-16 32A16 16 0 0 0 400 64h16v96h-16a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h96a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zM336 64h-67a16 16 0 0 0-13.14 6.87l-79.9 115-79.9-115A16 16 0 0 0 83 64H16A16 16 0 0 0 0 80v48a16 16 0 0 0 16 16h33.48l77.81 112-77.81 112H16a16 16 0 0 0-16 16v48a16 16 0 0 0 16 16h67a16 16 0 0 0 13.14-6.87l79.9-115 79.9 115A16 16 0 0 0 269 448h67a16 16 0 0 0 16-16v-48a16 16 0 0 0-16-16h-33.48l-77.81-112 77.81-112H336a16 16 0 0 0 16-16V80a16 16 0 0 0-16-16z"
+                                        />
+                                    </svg>
+                                </x-filament-forms::rich-editor.toolbar.button>
+                            @endif
+
+                            @if ($hasToolbarButton('link'))
+                                <x-filament-forms::rich-editor.toolbar.button
+                                    type="link"
+                                    :x-on:click="$getAction('link')->getAlpineClickHandler()"
+                                    title="{{ __('filament-forms::components.rich_editor.toolbar_buttons.link') }}"
+                                    tabindex="-1"
+                                >
+                                    <x-filament::icon
+                                        :icon="\Filament\Support\Icons\Heroicon::Link"
+                                        class="h-5 w-5"
+                                    />
+                                </x-filament-forms::rich-editor.toolbar.button>
+                            @endif
+                        </x-filament-forms::rich-editor.toolbar.group>
+                    @endif
+
+                    @if ($hasToolbarButton(['h1', 'h2', 'h3']))
+                        <x-filament-forms::rich-editor.toolbar.group>
+                            @if ($hasToolbarButton('h1'))
+                                <x-filament-forms::rich-editor.toolbar.button
+                                    type="heading"
+                                    :active-options="['level' => 1]"
+                                    x-on:click="getEditor().chain().focus().toggleHeading({ level: 1 }).run()"
+                                    title="{{ __('filament-forms::components.rich_editor.toolbar_buttons.h1') }}"
+                                    tabindex="-1"
+                                >
+                                    <x-filament::icon
+                                        :icon="\Filament\Support\Icons\Heroicon::H1"
+                                        class="h-5 w-5"
+                                    />
+                                </x-filament-forms::rich-editor.toolbar.button>
+                            @endif
+
+                            @if ($hasToolbarButton('h2'))
+                                <x-filament-forms::rich-editor.toolbar.button
+                                    type="heading"
+                                    :active-options="['level' => 2]"
+                                    x-on:click="getEditor().chain().focus().toggleHeading({ level: 2 }).run()"
+                                    title="{{ __('filament-forms::components.rich_editor.toolbar_buttons.h2') }}"
+                                    tabindex="-1"
+                                >
+                                    <x-filament::icon
+                                        :icon="\Filament\Support\Icons\Heroicon::H2"
+                                        class="h-5 w-5"
+                                    />
+                                </x-filament-forms::rich-editor.toolbar.button>
+                            @endif
+
+                            @if ($hasToolbarButton('h3'))
+                                <x-filament-forms::rich-editor.toolbar.button
+                                    type="heading"
+                                    :active-options="['level' => 3]"
+                                    x-on:click="getEditor().chain().focus().toggleHeading({ level: 3 }).run()"
+                                    title="{{ __('filament-forms::components.rich_editor.toolbar_buttons.h3') }}"
+                                    tabindex="-1"
+                                >
+                                    <x-filament::icon
+                                        :icon="\Filament\Support\Icons\Heroicon::H3"
+                                        class="h-5 w-5"
+                                    />
+                                </x-filament-forms::rich-editor.toolbar.button>
+                            @endif
+                        </x-filament-forms::rich-editor.toolbar.group>
+                    @endif
+
+                    @if ($hasToolbarButton(['blockquote', 'codeBlock', 'bulletList', 'orderedList']))
+                        <x-filament-forms::rich-editor.toolbar.group>
+                            @if ($hasToolbarButton('blockquote'))
+                                <x-filament-forms::rich-editor.toolbar.button
+                                    type="blockquote"
+                                    x-on:click="getEditor().chain().focus().toggleBlockquote().run()"
+                                    title="{{ __('filament-forms::components.rich_editor.toolbar_buttons.blockquote') }}"
+                                    tabindex="-1"
+                                >
+                                    <x-filament::icon
+                                        :icon="\Filament\Support\Icons\Heroicon::ChatBubbleBottomCenterText"
+                                        class="h-5 w-5"
+                                    />
+                                </x-filament-forms::rich-editor.toolbar.button>
+                            @endif
+
+                            @if ($hasToolbarButton('codeBlock'))
+                                <x-filament-forms::rich-editor.toolbar.button
+                                    type="codeBlock"
+                                    x-on:click="getEditor().chain().focus().toggleCodeBlock().run()"
+                                    title="{{ __('filament-forms::components.rich_editor.toolbar_buttons.code_block') }}"
+                                    tabindex="-1"
+                                >
+                                    <x-filament::icon
+                                        :icon="\Filament\Support\Icons\Heroicon::CodeBracket"
+                                        class="h-5 w-5"
+                                    />
+                                </x-filament-forms::rich-editor.toolbar.button>
+                            @endif
+
+                            @if ($hasToolbarButton('bulletList'))
+                                <x-filament-forms::rich-editor.toolbar.button
+                                    type="bulletList"
+                                    x-on:click="getEditor().chain().focus().toggleBulletList().run()"
+                                    title="{{ __('filament-forms::components.rich_editor.toolbar_buttons.bullet_list') }}"
+                                    tabindex="-1"
+                                >
+                                    <x-filament::icon
+                                        :icon="\Filament\Support\Icons\Heroicon::ListBullet"
+                                        class="h-5 w-5"
+                                    />
+                                </x-filament-forms::rich-editor.toolbar.button>
+                            @endif
+
+                            @if ($hasToolbarButton('orderedList'))
+                                <x-filament-forms::rich-editor.toolbar.button
+                                    type="orderedList"
+                                    x-on:click="getEditor().chain().focus().toggleOrderedList().run()"
+                                    title="{{ __('filament-forms::components.rich_editor.toolbar_buttons.ordered_list') }}"
+                                    tabindex="-1"
+                                >
+                                    <x-filament::icon
+                                        :icon="\Filament\Support\Icons\Heroicon::NumberedList"
+                                        class="h-5 w-5"
+                                    />
+                                </x-filament-forms::rich-editor.toolbar.button>
+                            @endif
+                        </x-filament-forms::rich-editor.toolbar.group>
+                    @endif
+
+                    @if ($hasToolbarButton('attachFiles'))
+                        <x-filament-forms::rich-editor.toolbar.group>
+                            <x-filament-forms::rich-editor.toolbar.button
+                                type="image"
+                                :x-on:click="$getAction('attachFiles')->getAlpineClickHandler()"
+                                title="{{ __('filament-forms::components.rich_editor.toolbar_buttons.attach_files') }}"
+                                tabindex="-1"
                             >
-                                @if ($hasToolbarButton('undo'))
-                                    <x-filament-forms::rich-editor.toolbar.button
-                                        data-trix-action="undo"
-                                        data-trix-key="z"
-                                        title="{{ __('filament-forms::components.rich_editor.toolbar_buttons.undo') }}"
-                                        tabindex="-1"
-                                    >
-                                        <x-filament::icon
-                                            icon="heroicon-m-arrow-uturn-left"
-                                            class="h-5 w-5"
-                                        />
-                                    </x-filament-forms::rich-editor.toolbar.button>
-                                @endif
-
-                                @if ($hasToolbarButton('redo'))
-                                    <x-filament-forms::rich-editor.toolbar.button
-                                        data-trix-action="redo"
-                                        data-trix-key="shift+z"
-                                        title="{{ __('filament-forms::components.rich_editor.toolbar_buttons.redo') }}"
-                                        tabindex="-1"
-                                    >
-                                        <x-filament::icon
-                                            icon="heroicon-m-arrow-uturn-right"
-                                            class="h-5 w-5"
-                                        />
-                                    </x-filament-forms::rich-editor.toolbar.button>
-                                @endif
-                            </x-filament-forms::rich-editor.toolbar.group>
-                        @endif
-                    </div>
-
-                    <div x-cloak data-trix-dialogs class="trix-dialogs">
-                        <div
-                            data-trix-dialog="href"
-                            data-trix-dialog-attribute="href"
-                            class="trix-dialog trix-dialog--link"
-                        >
-                            <div class="trix-dialog__link-fields">
-                                <input
-                                    aria-label="{{ __('filament-forms::components.rich_editor.dialogs.link.label') }}"
-                                    data-trix-input
-                                    disabled
-                                    name="href"
-                                    placeholder="{{ __('filament-forms::components.rich_editor.dialogs.link.placeholder') }}"
-                                    required
-                                    type="text"
-                                    inputmode="url"
-                                    class="trix-input trix-input--dialog"
+                                <x-filament::icon
+                                    :icon="\Filament\Support\Icons\Heroicon::Photo"
+                                    class="h-5 w-5"
                                 />
+                            </x-filament-forms::rich-editor.toolbar.button>
+                        </x-filament-forms::rich-editor.toolbar.group>
+                    @endif
 
-                                <div class="trix-button-group">
-                                    <input
-                                        data-trix-method="setAttribute"
-                                        type="button"
-                                        value="{{ __('filament-forms::components.rich_editor.dialogs.link.actions.link') }}"
-                                        class="trix-button trix-button--dialog"
+                    @if ($hasToolbarButton(['undo', 'redo']))
+                        <x-filament-forms::rich-editor.toolbar.group>
+                            @if ($hasToolbarButton('undo'))
+                                <x-filament-forms::rich-editor.toolbar.button
+                                    x-on:click="getEditor().chain().focus().undo().run()"
+                                    title="{{ __('filament-forms::components.rich_editor.toolbar_buttons.undo') }}"
+                                    tabindex="-1"
+                                >
+                                    <x-filament::icon
+                                        :icon="\Filament\Support\Icons\Heroicon::ArrowUturnLeft"
+                                        class="h-5 w-5"
                                     />
+                                </x-filament-forms::rich-editor.toolbar.button>
+                            @endif
 
-                                    <input
-                                        data-trix-method="removeAttribute"
-                                        type="button"
-                                        value="{{ __('filament-forms::components.rich_editor.dialogs.link.actions.unlink') }}"
-                                        class="trix-button trix-button--dialog"
+                            @if ($hasToolbarButton('redo'))
+                                <x-filament-forms::rich-editor.toolbar.button
+                                    x-on:click="getEditor().chain().focus().redo().run()"
+                                    title="{{ __('filament-forms::components.rich_editor.toolbar_buttons.redo') }}"
+                                    tabindex="-1"
+                                >
+                                    <x-filament::icon
+                                        :icon="\Filament\Support\Icons\Heroicon::ArrowUturnRight"
+                                        class="h-5 w-5"
                                     />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </trix-toolbar>
-
-                <trix-editor
-                    @if ($isAutofocused())
-                        autofocus
+                                </x-filament-forms::rich-editor.toolbar.button>
+                            @endif
+                        </x-filament-forms::rich-editor.toolbar.group>
                     @endif
-                    id="{{ $id }}"
-                    input="trix-value-{{ $id }}"
-                    placeholder="{{ $getPlaceholder() }}"
-                    toolbar="trix-toolbar-{{ $id }}"
-                    @if ($isLiveOnBlur())
-                        x-on:blur="$wire.call('$refresh')"
-                    @endif
-                    x-ref="trix"
-                    wire:ignore
-                    @if ($isGrammarlyDisabled())
-                        data-gramm="false"
-                        data-gramm_editor="false"
-                        data-enable-grammarly="false"
-                    @endif
-                    {{
-                        $getExtraInputAttributeBag()->class([
-                            'fi-fo-rich-editor-editor prose min-h-[theme(spacing.48)] max-w-none !border-none px-3 py-1.5 text-base text-gray-950 dark:prose-invert focus-visible:outline-none dark:text-white sm:text-sm sm:leading-6',
-                        ])
-                    }}
-                ></trix-editor>
+                </div>
             </div>
+
+            <div
+                class="prose min-h-full w-full max-w-none px-5"
+                x-ref="editor"
+                wire:ignore
+            ></div>
         </x-filament::input.wrapper>
-    @endif
+    </div>
 </x-dynamic-component>

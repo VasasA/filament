@@ -105,7 +105,7 @@ class CheckTranslationsCommand extends Command implements PromptsForMissingInput
                 $locales = $this->argument('locales'),
                 fn (Collection $availableLocales): Collection => $availableLocales->filter(fn (string $locale): bool => in_array($locale, $locales))
             )
-            ->each(function (string $locale, string $localeDir) use ($filesystem, $localeRootDirectory, $package) {
+            ->each(function (string $locale, string $localeDir) use ($filesystem, $localeRootDirectory, $package): void {
                 $files = $filesystem->allFiles($localeDir);
                 $baseFiles = $filesystem->allFiles(implode(DIRECTORY_SEPARATOR, [$localeRootDirectory, 'en']));
 
@@ -188,7 +188,7 @@ class CheckTranslationsCommand extends Command implements PromptsForMissingInput
     protected function displayTranslations(Collection $missings, string $locale, string $package): void
     {
         collect($missings)
-            ->tap(function (Collection $files) use ($locale, $package) {
+            ->tap(function (Collection $files) use ($locale, $package): void {
                 $expectedKeysCount = $files->sum(fn ($file): int => $file['expected_keys_count']);
                 $missingKeysCount = $files->sum(fn ($file): int => $file['missing_keys_count']);
                 $removedKeysCount = $files->sum(fn ($file): int => $file['removed_keys_count']);
@@ -208,7 +208,7 @@ class CheckTranslationsCommand extends Command implements PromptsForMissingInput
                     info($message);
                 }
             })
-            ->each(function ($keys, string $file) {
+            ->each(function ($keys, string $file): void {
                 $counts = [
                     'expected_keys_count' => '- Number of expected keys: ' . $keys['expected_keys_count'],
                     'missing_keys_count' => '- Number of missing keys: ' . $keys['missing_keys_count'],
@@ -248,7 +248,7 @@ class CheckTranslationsCommand extends Command implements PromptsForMissingInput
     protected function displayMissings(Collection $missings, string $locale, string $package): void
     {
         collect($missings)
-            ->tap(function (Collection $files) use ($locale, $package) {
+            ->tap(function (Collection $files) use ($locale, $package): void {
                 $missingKeysCount = $files->sum(fn ($file): int => count($file['missing']));
                 $removedKeysCount = $files->sum(fn ($file): int => count($file['removed']));
 
@@ -265,7 +265,7 @@ class CheckTranslationsCommand extends Command implements PromptsForMissingInput
                 }
             })
             ->filter(static fn ($keys): bool => count($keys['missing']) || count($keys['removed']))
-            ->each(function ($keys, string $file) {
+            ->each(function ($keys, string $file): void {
                 table(
                     [$file, ''],
                     [

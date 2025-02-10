@@ -3,6 +3,7 @@
 use Filament\Actions\Action;
 use Filament\Actions\Testing\Fixtures\TestAction;
 use Filament\Forms\Components\TextInput;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tests\Fixtures\Livewire\Actions;
 use Filament\Tests\TestCase;
 use Illuminate\Support\Str;
@@ -129,12 +130,12 @@ it('can disable an action', function () {
 
 it('can have an icon', function () {
     livewire(Actions::class)
-        ->assertActionHasIcon(TestAction::make('hasIcon')->schemaComponent('form.textInput'), 'heroicon-m-pencil-square')
-        ->assertActionDoesNotHaveIcon(TestAction::make('hasIcon')->schemaComponent('form.textInput'), 'heroicon-m-trash');
+        ->assertActionHasIcon(TestAction::make('hasIcon')->schemaComponent('form.textInput'), Heroicon::PencilSquare)
+        ->assertActionDoesNotHaveIcon(TestAction::make('hasIcon')->schemaComponent('form.textInput'), Heroicon::Trash);
 
     livewire(Actions::class)
-        ->assertFormComponentActionHasIcon('textInput', 'hasIcon', 'heroicon-m-pencil-square')
-        ->assertFormComponentActionDoesNotHaveIcon('textInput', 'hasIcon', 'heroicon-m-trash');
+        ->assertFormComponentActionHasIcon('textInput', 'hasIcon', Heroicon::PencilSquare)
+        ->assertFormComponentActionDoesNotHaveIcon('textInput', 'hasIcon', Heroicon::Trash);
 });
 
 it('can have a label', function () {

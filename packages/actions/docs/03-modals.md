@@ -345,7 +345,7 @@ You can change the width of the modal by using the `modalWidth()` method. Option
 
 ```php
 use Filament\Actions\Action;
-use Filament\Support\Enums\MaxWidth;
+use Filament\Support\Enums\Width;
 
 Action::make('updateAuthor')
     ->form([
@@ -354,7 +354,7 @@ Action::make('updateAuthor')
     ->action(function (array $data): void {
         // ...
     })
-    ->modalWidth(MaxWidth::FiveExtraLarge)
+    ->modalWidth(Width::FiveExtraLarge)
 ```
 
 ## Executing code when the modal opens

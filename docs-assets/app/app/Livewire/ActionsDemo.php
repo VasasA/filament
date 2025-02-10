@@ -12,6 +12,7 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Schemas\Components\Wizard\Step;
 use Filament\Support\Enums\ActionSize;
 use Filament\Support\Enums\IconPosition;
+use Filament\Support\Icons\Heroicon;
 use Livewire\Component;
 
 class ActionsDemo extends Component implements HasActions, HasForms
@@ -36,7 +37,7 @@ class ActionsDemo extends Component implements HasActions, HasForms
     public function iconButtonAction(): Action
     {
         return Action::make('iconButton')
-            ->icon('heroicon-m-pencil-square')
+            ->icon(Heroicon::PencilSquare)
             ->iconButton();
     }
 
@@ -65,14 +66,14 @@ class ActionsDemo extends Component implements HasActions, HasForms
     {
         return Action::make('icon')
             ->label('Edit')
-            ->icon('heroicon-m-pencil-square');
+            ->icon(Heroicon::PencilSquare);
     }
 
     public function iconAfterAction(): Action
     {
         return Action::make('iconAfter')
             ->label('Edit')
-            ->icon('heroicon-m-pencil-square')
+            ->icon(Heroicon::PencilSquare)
             ->iconPosition(IconPosition::After);
     }
 
@@ -80,7 +81,7 @@ class ActionsDemo extends Component implements HasActions, HasForms
     {
         return Action::make('badged')
             ->iconButton()
-            ->icon('heroicon-m-funnel')
+            ->icon(Heroicon::Funnel)
             ->badge(5);
     }
 
@@ -88,7 +89,7 @@ class ActionsDemo extends Component implements HasActions, HasForms
     {
         return Action::make('successBadged')
             ->iconButton()
-            ->icon('heroicon-m-funnel')
+            ->icon(Heroicon::Funnel)
             ->badge(5)
             ->badgeColor('success');
     }
@@ -129,7 +130,7 @@ class ActionsDemo extends Component implements HasActions, HasForms
             ->color('danger')
             ->requiresConfirmation()
             ->action(fn () => null)
-            ->modalIcon('heroicon-o-trash');
+            ->modalIcon(Heroicon::OutlinedTrash);
     }
 
     public function modalFormAction(): Action

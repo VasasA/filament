@@ -82,12 +82,12 @@ The dropdown may be set to a width by using the `dropdownWidth()` method. Option
 
 ```php
 use Filament\Actions\ActionGroup;
-use Filament\Support\Enums\MaxWidth;
+use Filament\Support\Enums\Width;
 
 ActionGroup::make([
     // Array of actions
 ])
-    ->dropdownWidth(MaxWidth::ExtraSmall)
+    ->dropdownWidth(Width::ExtraSmall)
 ```
 
 ## Controlling the maximum height of the dropdown

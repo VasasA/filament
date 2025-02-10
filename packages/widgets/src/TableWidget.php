@@ -22,7 +22,7 @@ class TableWidget extends Widget implements Actions\Contracts\HasActions, Forms\
     /**
      * @var view-string
      */
-    protected static string $view = 'filament-widgets::table-widget';
+    protected string $view = 'filament-widgets::table-widget';
 
     /**
      * @deprecated Override the `table()` method to configure the table.

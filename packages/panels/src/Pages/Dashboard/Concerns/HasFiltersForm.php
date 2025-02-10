@@ -4,7 +4,7 @@ namespace Filament\Pages\Dashboard\Concerns;
 
 use Filament\Schemas\Schema;
 
-trait HasFiltersForm
+trait HasFiltersForm /** @phpstan-ignore trait.unused */
 {
     use HasFilters;
 
@@ -15,9 +15,9 @@ trait HasFiltersForm
         ];
     }
 
-    public function filtersForm(Schema $form): Schema
+    public function filtersForm(Schema $schema): Schema
     {
-        return $form;
+        return $schema;
     }
 
     public function getFiltersForm(): Schema

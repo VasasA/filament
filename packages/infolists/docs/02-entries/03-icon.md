@@ -47,10 +47,10 @@ In the function, `$state` is the value of the entry, and `$record` can be used t
 The default icon size is `IconEntrySize::Large`, but you may customize the size to be either `IconEntrySize::ExtraSmall`, `IconEntrySize::Small`, `IconEntrySize::Medium`, `IconEntrySize::ExtraLarge` or `IconEntrySize::TwoExtraLarge`:
 
 ```php
-use Filament\Infolists\Components\IconEntry;
+use Filament\Support\Enums\IconSize;
 
 IconEntry::make('status')
-    ->size(IconEntry\Enums\IconEntrySize::Medium)
+    ->size(IconSize::Medium)
 ```
 
 <AutoScreenshot name="infolists/entries/icon/medium" alt="Medium-sized icon entry" version="4.x" />

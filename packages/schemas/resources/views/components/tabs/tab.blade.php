@@ -16,7 +16,7 @@
     $childComponentContainer = $getChildComponentContainer();
 @endphp
 
-@if (! empty($childComponentContainer->getCachedVisibleComponents()))
+@if (! empty($childComponentContainer->getComponents()))
     @if (blank($livewireProperty))
         <div
             x-bind:class="{
@@ -34,10 +34,10 @@
                         'wire:key' => $getLivewireKey() . '.container',
                     ], escape: false)
                     ->merge($getExtraAttributes(), escape: false)
-                    ->class(['fi-fo-tabs-tab outline-none'])
+                    ->class(['fi-fo-tabs-tab outline-hidden'])
             }}
         >
-            {{ $getChildComponentContainer() }}
+            {{ $childComponentContainer }}
         </div>
     @elseif (strval($this->{$livewireProperty}) === strval($key))
         <div
@@ -52,12 +52,12 @@
                     ], escape: false)
                     ->merge($getExtraAttributes(), escape: false)
                     ->class([
-                        'fi-fo-tabs-tab outline-none',
+                        'fi-fo-tabs-tab outline-hidden',
                         $activeTabClasses,
                     ])
             }}
         >
-            {{ $getChildComponentContainer() }}
+            {{ $childComponentContainer }}
         </div>
     @endif
 @endif

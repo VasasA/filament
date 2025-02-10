@@ -5,6 +5,7 @@ import { md5 } from 'js-md5'
 import Sortable from './sortable'
 import Tooltip from '@ryangjchandler/alpine-tooltip'
 import dropdown from './components/dropdown.js'
+import formButton from './components/form-button.js'
 import modal from './components/modal.js'
 
 import '../css/components/actions.css'
@@ -18,7 +19,13 @@ import '../css/components/dropdown/list/index.css'
 import '../css/components/dropdown/list/item.css'
 import '../css/components/fieldset.css'
 import '../css/components/grid.css'
+import '../css/components/icon.css'
 import '../css/components/icon-button.css'
+import '../css/components/infolists/entry.css'
+import '../css/components/infolists/entries/color.css'
+import '../css/components/infolists/entries/icon.css'
+import '../css/components/infolists/entries/image.css'
+import '../css/components/infolists/entries/text.css'
 import '../css/components/input/checkbox.css'
 import '../css/components/input/index.css'
 import '../css/components/input/one-time-code.css'
@@ -72,10 +79,21 @@ document.addEventListener('alpine:init', () => {
     window.Alpine.plugin(Sortable)
     window.Alpine.plugin(Tooltip)
     window.Alpine.data('filamentDropdown', dropdown)
+    window.Alpine.data('filamentFormButton', formButton)
     window.Alpine.data('filamentModal', modal)
 })
 
 document.addEventListener('livewire:init', () => {
+    const findClosestLivewireComponent = (el) => {
+        let closestRoot = Alpine.findClosest(el, (i) => i.__livewire)
+
+        if (!closestRoot) {
+            throw 'Could not find Livewire component in DOM tree'
+        }
+
+        return closestRoot.__livewire
+    }
+
     Livewire.hook('commit', ({ component, commit, respond, succeed, fail }) => {
         respond(() => {
             queueMicrotask(() => {
@@ -86,13 +104,23 @@ document.addEventListener('livewire:init', () => {
                 for (const [name, html] of Object.entries(
                     component.effects.partials ?? {},
                 )) {
-                    let el = component.el.querySelector(
-                        '[wire\\:partial="' + name + '"]',
+                    let els = Array.from(
+                        component.el.querySelectorAll(
+                            `[wire\\:partial="${name}"]`,
+                        ),
+                    ).filter(
+                        (el) => findClosestLivewireComponent(el) === component,
                     )
 
-                    if (!el) {
+                    if (!els.length) {
                         continue
                     }
+
+                    if (els.length > 1) {
+                        throw `Multiple elements found for partial [${name}].`
+                    }
+
+                    let el = els[0]
 
                     let wrapperTag = el.parentElement
                         ? // If the root element is a "tr", we need the wrapper to be a "table"...
@@ -102,13 +130,7 @@ document.addEventListener('livewire:init', () => {
                     let wrapper = document.createElement(wrapperTag)
 
                     wrapper.innerHTML = html
-                    let parentComponent
-
-                    try {
-                        parentComponent = closestComponent(el.parentElement)
-                    } catch (exception) {}
-
-                    parentComponent && (wrapper.__livewire = parentComponent)
+                    wrapper.__livewire = component
 
                     let to = wrapper.firstElementChild
 
@@ -118,6 +140,16 @@ document.addEventListener('livewire:init', () => {
                         updating: (el, toEl, childrenOnly, skip) => {
                             if (isntElement(el)) {
                                 return
+                            }
+
+                            if (el.__livewire_replace === true) {
+                                el.innerHTML = toEl.innerHTML
+                            }
+
+                            if (el.__livewire_replace_self === true) {
+                                el.outerHTML = toEl.outerHTML
+
+                                return skip()
                             }
 
                             if (el.__livewire_ignore === true) {
@@ -169,19 +201,42 @@ document.addEventListener('livewire:init', () => {
         function isComponentRootEl(el) {
             return el.hasAttribute('wire:id')
         }
+    })
 
-        function closestComponent(el, strict = true) {
-            let closestRoot = Alpine.findClosest(el, (i) => i.__livewire)
+    Livewire.hook('commit', ({ component, commit, respond, succeed, fail }) => {
+        succeed(({ snapshot, effects }) => {
+            effects.dispatches?.forEach((dispatch) => {
+                if (!dispatch.params?.awaitSchemaComponent) {
+                    return
+                }
 
-            if (!closestRoot) {
-                if (strict)
-                    throw 'Could not find Livewire component in DOM tree'
+                let els = Array.from(
+                    component.el.querySelectorAll(
+                        `[wire\\:partial="schema-component::${dispatch.params.awaitSchemaComponent}"]`,
+                    ),
+                ).filter((el) => findClosestLivewireComponent(el) === component)
 
-                return
-            }
+                if (els.length === 1) {
+                    return
+                }
 
-            return closestRoot.__livewire
-        }
+                if (els.length > 1) {
+                    throw `Multiple schema components found with key [${dispatch.params.awaitSchemaComponent}].`
+                }
+
+                window.addEventListener(
+                    `schema-component-${component.id}-${dispatch.params.awaitSchemaComponent}-loaded`,
+                    () => {
+                        window.dispatchEvent(
+                            new CustomEvent(dispatch.name, {
+                                detail: dispatch.params,
+                            }),
+                        )
+                    },
+                    { once: true },
+                )
+            })
+        })
     })
 })
 

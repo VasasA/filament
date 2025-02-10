@@ -18,6 +18,8 @@
     <x-filament-notifications::database.modal
         :notifications="$notifications"
         :unread-notifications-count="$unreadNotificationsCount"
+        :clear-notifications-action="$this->clearNotificationsAction"
+        :mark-all-notifications-as-read-action="$this->markAllNotificationsAsReadAction"
     />
 
     @if ($broadcastChannel = $this->getBroadcastChannel())

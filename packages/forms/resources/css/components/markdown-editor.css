@@ -238,7 +238,7 @@
 }
 
 .EasyMDEContainer .editor-toolbar .separator {
-    @apply !m-0 w-1 border-none;
+    @apply m-0! w-1 border-none;
 }
 
 .EasyMDEContainer .editor-toolbar .bold::before {

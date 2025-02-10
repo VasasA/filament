@@ -4,8 +4,6 @@ namespace Filament\Actions;
 
 use Closure;
 use Filament\Actions\Concerns\HasTooltip;
-use Filament\Schemas\Components\Actions\ActionContainer;
-use Filament\Schemas\Components\Actions\ActionContainer as InfolistActionContainer;
 use Filament\Support\Components\ViewComponent;
 use Filament\Support\Concerns\HasBadge;
 use Filament\Support\Concerns\HasColor;
@@ -395,8 +393,12 @@ class Action extends ViewComponent implements Arrayable
         return 'callMountedAction';
     }
 
-    protected function getJavaScriptClickHandler(): string
+    protected function getJavaScriptClickHandler(): ?string
     {
+        if ($this->shouldClose()) {
+            return null;
+        }
+
         $argumentsParameter = '';
 
         if (count($arguments = $this->getArguments())) {
@@ -410,8 +412,8 @@ class Action extends ViewComponent implements Arrayable
             $context['recordKey'] = $this->resolveRecordKey($record);
         }
 
-        if (filled($componentKey = $this->getSchemaComponent()?->getKey())) {
-            $context['schemaComponent'] = $componentKey;
+        if (filled($schemaComponentKey = ($this->getSchemaComponentContainer() ?? $this->getSchemaComponent())?->getKey())) {
+            $context['schemaComponent'] = $schemaComponentKey;
         }
 
         $table = $this->getTable();
@@ -446,14 +448,15 @@ class Action extends ViewComponent implements Arrayable
         return match ($parameterName) {
             'arguments' => [$this->getArguments()],
             'component', 'schemaComponent' => [$this->getSchemaComponent()],
-            'context', 'operation' => [$this->getSchemaComponent()->getContainer()->getOperation()],
+            'context', 'operation' => [$this->getSchemaComponentContainer()?->getOperation() ?? $this->getSchemaComponent()?->getContainer()->getOperation()],
             'data' => [$this->getFormData()],
             'get' => [$this->getSchemaComponent()->makeGetUtility()],
             'livewire' => [$this->getLivewire()],
-            'model' => [$this->getModel() ?? $this->getSchemaComponent()?->getModel()],
+            'model' => [$this->getModel() ?? $this->getSchemaComponentContainer()?->getModel() ?? $this->getSchemaComponent()?->getModel()],
             'mountedActions' => [$this->getLivewire()->getMountedActions()],
-            'record' => [$this->getRecord() ?? $this->getSchemaComponent()?->getRecord()],
+            'record' => [$this->getRecord() ?? $this->getSchemaComponentContainer()?->getRecord() ?? $this->getSchemaComponent()?->getRecord()],
             'records', 'selectedRecords' => [$this->getSelectedRecords()],
+            'schema' => [$this->getSchemaComponentContainer()],
             'set' => [$this->getSchemaComponent()->makeSetUtility()],
             'state' => [$this->getSchemaComponent()->getState()],
             'table' => [$this->getTable()],
@@ -466,7 +469,7 @@ class Action extends ViewComponent implements Arrayable
      */
     protected function resolveDefaultClosureDependencyForEvaluationByType(string $parameterType): array
     {
-        $record = $this->getRecord() ?? $this->getSchemaComponent()?->getRecord();
+        $record = $this->getRecord() ?? $this->getSchemaComponentContainer()?->getRecord() ?? $this->getSchemaComponent()?->getRecord();
 
         return match ($parameterType) {
             EloquentCollection::class, Collection::class => [$this->getSelectedRecords()],
@@ -493,24 +496,6 @@ class Action extends ViewComponent implements Arrayable
         }
 
         $this->record(null);
-    }
-
-    public function toFormComponent(): ActionContainer
-    {
-        $component = ActionContainer::make($this);
-
-        $this->schemaComponent($component);
-
-        return $component;
-    }
-
-    public function toInfolistComponent(): InfolistActionContainer
-    {
-        $component = InfolistActionContainer::make($this);
-
-        $this->schemaComponent($component);
-
-        return $component;
     }
 
     /**
@@ -723,5 +708,10 @@ class Action extends ViewComponent implements Arrayable
             static::LINK_VIEW => $this->renderLink(),
             default => parent::render(),
         };
+    }
+
+    public function getClone(): static
+    {
+        return clone $this;
     }
 }

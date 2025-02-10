@@ -14,11 +14,12 @@ use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Pages\Concerns;
 use Filament\Pages\Page;
 use Filament\Panel;
+use Filament\Schemas\Components\Actions;
 use Filament\Schemas\Components\Component;
-use Filament\Schemas\Components\Decorations\FormActionsDecorations;
 use Filament\Schemas\Components\Form;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\NestedSchema;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\Alignment;
@@ -27,6 +28,7 @@ use Filament\Support\Facades\FilamentView;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Route;
@@ -53,7 +55,7 @@ class EditProfile extends Page
 
     protected static bool $isDiscovered = false;
 
-    protected static string $view;
+    protected string $view;
 
     public function getLayout(): string
     {
@@ -67,7 +69,7 @@ class EditProfile extends Page
 
     public function getView(): string
     {
-        return static::$view ?? 'filament-panels::auth.pages.edit-profile';
+        return $this->view ?? 'filament-panels::auth.pages.edit-profile';
     }
 
     public static function getLabel(): string
@@ -334,9 +336,9 @@ class EditProfile extends Page
             ->dehydrated(false);
     }
 
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
-        return $form;
+        return $schema;
     }
 
     /**
@@ -441,7 +443,7 @@ class EditProfile extends Page
         return $schema
             ->components([
                 $this->getFormContentComponent(),
-                ...$this->getMultiFactorAuthenticationContentComponents(),
+                ...Arr::wrap($this->getMultiFactorAuthenticationContentComponent()),
             ]);
     }
 
@@ -450,29 +452,31 @@ class EditProfile extends Page
         return Form::make([NestedSchema::make('form')])
             ->id('form')
             ->livewireSubmitHandler('save')
-            ->footer(FormActionsDecorations::make($this->getFormActions())
-                ->alignment($this->getFormActionsAlignment())
-                ->fullWidth($this->hasFullWidthFormActions())
-                ->sticky((! static::isSimple()) && $this->areFormActionsSticky()));
+            ->footer([
+                Actions::make($this->getFormActions())
+                    ->alignment($this->getFormActionsAlignment())
+                    ->fullWidth($this->hasFullWidthFormActions())
+                    ->sticky((! static::isSimple()) && $this->areFormActionsSticky()),
+            ]);
     }
 
-    /**
-     * @return array<Component>
-     */
-    public function getMultiFactorAuthenticationContentComponents(): array
+    public function getMultiFactorAuthenticationContentComponent(): ?Component
     {
-        $providers = Filament::getMultiFactorAuthenticationProviders();
-
-        if (empty($providers)) {
-            return [];
+        if (! Filament::hasMultiFactorAuthentication()) {
+            return null;
         }
 
         $user = Filament::auth()->user();
 
-        return collect($providers)
-            ->sort(fn (MultiFactorAuthenticationProvider $multiFactorAuthenticationProvider): int => $multiFactorAuthenticationProvider->isEnabled($user) ? 0 : 1)
-            ->map(fn (MultiFactorAuthenticationProvider $multiFactorAuthenticationProvider): Component => Group::make($multiFactorAuthenticationProvider->getManagementSchemaComponents())
-                ->statePath($multiFactorAuthenticationProvider->getId()))
-            ->all();
+        return Section::make()
+            ->label(__('filament-panels::auth/pages/edit-profile.multi_factor_authentication.label'))
+            ->compact()
+            ->divided()
+            ->secondary()
+            ->schema(collect(Filament::getMultiFactorAuthenticationProviders())
+                ->sort(fn (MultiFactorAuthenticationProvider $multiFactorAuthenticationProvider): int => $multiFactorAuthenticationProvider->isEnabled($user) ? 0 : 1)
+                ->map(fn (MultiFactorAuthenticationProvider $multiFactorAuthenticationProvider): Component => Group::make($multiFactorAuthenticationProvider->getManagementSchemaComponents())
+                    ->statePath($multiFactorAuthenticationProvider->getId()))
+                ->all());
     }
 }

@@ -4,33 +4,29 @@ namespace Filament\Schemas\Components;
 
 use Closure;
 use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Schemas\Components\Concerns\EntanglesStateWithSingularRelationship;
-use Filament\Schemas\Components\Concerns\HasFooterActions;
-use Filament\Schemas\Components\Concerns\HasHeaderActions;
 use Filament\Schemas\Components\Contracts\CanEntangleWithSingularRelationships;
 use Filament\Schemas\Components\Contracts\ExposesStateToActionData;
-use Filament\Schemas\Components\Decorations\Layouts\AlignDecorations;
-use Filament\Schemas\Components\Decorations\Layouts\DecorationsLayout;
+use Filament\Schemas\Schema;
 
-class Form extends Component implements CanEntangleWithSingularRelationships, Contracts\HasFooterActions, Contracts\HasHeaderActions, ExposesStateToActionData
+class Form extends Component implements CanEntangleWithSingularRelationships, ExposesStateToActionData
 {
     use EntanglesStateWithSingularRelationship;
-    use HasFooterActions;
-    use HasHeaderActions;
 
     /**
      * @var view-string
      */
-    protected string $view = 'filament-schema::components.form';
+    protected string $view = 'filament-schemas::components.form';
 
     protected string | Closure | null $livewireSubmitHandler = null;
 
-    const HEADER_DECORATIONS = 'header';
+    const HEADER_CONTAINER = 'header';
 
-    const FOOTER_DECORATIONS = 'footer';
+    const FOOTER_CONTAINER = 'footer';
 
     /**
-     * @param  array<Component> | Closure  $schema
+     * @param  array<Component | Action | ActionGroup> | Closure  $schema
      */
     final public function __construct(array | Closure $schema = [])
     {
@@ -38,7 +34,7 @@ class Form extends Component implements CanEntangleWithSingularRelationships, Co
     }
 
     /**
-     * @param  array<Component> | Closure  $schema
+     * @param  array<Component | Action | ActionGroup> | Closure  $schema
      */
     public static function make(array | Closure $schema = []): static
     {
@@ -46,14 +42,6 @@ class Form extends Component implements CanEntangleWithSingularRelationships, Co
         $static->configure();
 
         return $static;
-    }
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->header(fn (Form $component): array => $component->getHeaderActions());
-        $this->setUpFooterActions();
     }
 
     public function action(Action | Closure | null $action): static
@@ -80,31 +68,36 @@ class Form extends Component implements CanEntangleWithSingularRelationships, Co
     }
 
     /**
-     * @param  array<Component | Action> | DecorationsLayout | Component | Action | string | Closure | null  $decorations
+     * @param  array<Component | Action | ActionGroup | string> | Schema | Component | Action | ActionGroup | string | Closure | null  $components
      */
-    public function header(array | DecorationsLayout | Component | Action | string | Closure | null $decorations): static
+    public function header(array | Schema | Component | Action | ActionGroup | string | Closure | null $components): static
     {
-        $this->decorations(
-            static::HEADER_DECORATIONS,
-            $decorations,
-            makeDefaultLayoutUsing: fn (array $decorations): AlignDecorations => AlignDecorations::end($decorations),
-        );
+        $this->childComponents($components, static::HEADER_CONTAINER);
 
         return $this;
     }
 
     /**
-     * @param  array<Component | Action> | DecorationsLayout | Component | Action | string | Closure | null  $decorations
+     * @param  array<Component | Action | ActionGroup | string> | Schema | Component | Action | ActionGroup | string | Closure | null  $components
      */
-    public function footer(array | DecorationsLayout | Component | Action | string | Closure | null $decorations): static
+    public function footer(array | Schema | Component | Action | ActionGroup | string | Closure | null $components): static
     {
-        $this->decorations(static::FOOTER_DECORATIONS, $decorations);
+        $this->childComponents($components, static::FOOTER_CONTAINER);
 
         return $this;
     }
 
-    public function prepareDecorationAction(Action $action): Action
+    protected function configureSchemaForSlot(Schema $schema, string $slot): Schema
     {
-        return $this->prepareAction($action);
+        $schema = parent::configureSchemaForSlot($schema, $slot);
+
+        if (in_array($slot, [
+            static::HEADER_CONTAINER,
+            static::FOOTER_CONTAINER,
+        ])) {
+            $schema->embeddedInParentComponent();
+        }
+
+        return $schema;
     }
 }

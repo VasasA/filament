@@ -13,7 +13,8 @@
         $attributes
             ->merge($getExtraAttributes(), escape: false)
             ->class([
-                'fi-fo-split flex gap-6',
+                'fi-fo-split flex',
+                $isDense() ? 'gap-3' : 'gap-6',
                 match ($getFromBreakpoint()) {
                     'sm' => 'flex-col sm:flex-row ' . match ($verticalAlignment) {
                         VerticalAlignment::Center => 'sm:items-center',
@@ -49,15 +50,13 @@
             ])
     }}
 >
-    @foreach ($getChildComponentContainers() as $container)
-        @foreach ($container->getComponents() as $component)
-            <div
-                @class([
-                    'w-full flex-1' => $component->canGrow(),
-                ])
-            >
-                {{ $component }}
-            </div>
-        @endforeach
+    @foreach ($getChildComponentContainer()->getComponents() as $component)
+        <div
+            @class([
+                'w-full flex-1' => $component->canGrow(),
+            ])
+        >
+            {{ $component }}
+        </div>
     @endforeach
 </div>

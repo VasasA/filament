@@ -40,6 +40,10 @@ return [
 
     ],
 
+    'multi_factor_authentication' => [
+        'label' => 'Two-factor authentication (2FA)',
+    ],
+
     'notifications' => [
 
         'email_change_verification_sent' => [

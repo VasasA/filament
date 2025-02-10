@@ -2,8 +2,10 @@
 
 namespace Filament\Resources\Pages;
 
+use BackedEnum;
 use Closure;
 use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
@@ -11,9 +13,9 @@ use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\NestedSchema;
 use Filament\Schemas\Schema;
 use Filament\Support\Facades\FilamentIcon;
+use Filament\Support\Icons\Heroicon;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Arr;
 
 /**
  * @property-read Schema $form
@@ -28,11 +30,11 @@ class ViewRecord extends Page
      */
     public ?array $data = [];
 
-    public static function getNavigationIcon(): string | Htmlable | null
+    public static function getNavigationIcon(): string | BackedEnum | Htmlable | null
     {
         return static::$navigationIcon
             ?? FilamentIcon::resolve('panels::resources.pages.view-record.navigation-item')
-            ?? 'heroicon-o-eye';
+            ?? Heroicon::OutlinedEye;
     }
 
     public function getBreadcrumb(): string
@@ -92,14 +94,14 @@ class ViewRecord extends Page
     }
 
     /**
-     * @param  array<string>  $attributes
+     * @param  array<string>  $statePaths
      */
-    public function refreshFormData(array $attributes): void
+    public function refreshFormData(array $statePaths): void
     {
-        $this->data = [
-            ...$this->data,
-            ...Arr::only($this->getRecord()->attributesToArray(), $attributes),
-        ];
+        $this->form->fillPartially(
+            $this->mutateFormDataBeforeFill($this->getRecord()->attributesToArray()),
+            $statePaths,
+        );
     }
 
     /**
@@ -131,31 +133,31 @@ class ViewRecord extends Page
         ]);
     }
 
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
-        return $form;
+        return $schema;
     }
 
-    public function configureForm(Schema $form): Schema
+    public function configureForm(Schema $schema): Schema
     {
-        $form->columns($this->hasInlineLabels() ? 1 : 2);
-        $form->inlineLabel($this->hasInlineLabels());
+        $schema->columns($this->hasInlineLabels() ? 1 : 2);
+        $schema->inlineLabel($this->hasInlineLabels());
 
-        static::getResource()::form($form);
+        static::getResource()::form($schema);
 
-        $this->form($form);
+        $this->form($schema);
 
-        return $form;
+        return $schema;
     }
 
-    public function configureInfolist(Schema $infolist): Schema
+    public function configureInfolist(Schema $schema): Schema
     {
-        $infolist->columns($this->hasInlineLabels() ? 1 : 2);
-        $infolist->inlineLabel($this->hasInlineLabels());
+        $schema->columns($this->hasInlineLabels() ? 1 : 2);
+        $schema->inlineLabel($this->hasInlineLabels());
 
-        static::getResource()::infolist($infolist);
+        static::getResource()::infolist($schema);
 
-        return $infolist;
+        return $schema;
     }
 
     /**
@@ -202,7 +204,7 @@ class ViewRecord extends Page
     }
 
     /**
-     * @return array<Component>
+     * @return array<Component | Action | ActionGroup>
      */
     public function getContentComponents(): array
     {

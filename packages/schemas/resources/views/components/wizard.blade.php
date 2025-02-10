@@ -112,7 +112,7 @@
             ->merge($getExtraAlpineAttributes(), escape: false)
             ->class([
                 'fi-fo-wizard',
-                'fi-contained rounded-xl bg-white shadow-sm ring-1 ring-gray-950/5 dark:bg-gray-900 dark:ring-white/10' => $isContained,
+                'fi-contained rounded-xl bg-white ring-1 shadow-xs ring-gray-950/5 dark:bg-gray-900 dark:ring-white/10' => $isContained,
             ])
     }}
 >
@@ -134,9 +134,9 @@
         @endif
         role="list"
         @class([
-            'fi-fo-wizard-header grid divide-y divide-gray-200 dark:divide-white/5 md:grid-flow-col md:divide-y-0 md:overflow-x-auto',
+            'fi-fo-wizard-header grid divide-y divide-gray-200 md:grid-flow-col md:divide-y-0 md:overflow-x-auto dark:divide-white/5',
             'border-b border-gray-200 dark:border-white/10' => $isContained,
-            'rounded-xl bg-white shadow-sm ring-1 ring-gray-950/5 dark:bg-gray-900 dark:ring-white/10' => ! $isContained,
+            'rounded-xl bg-white ring-1 shadow-xs ring-gray-950/5 dark:bg-gray-900 dark:ring-white/10' => ! $isContained,
         ])
         x-ref="header"
     >
@@ -174,7 +174,7 @@
 
                         <x-filament::icon
                             :alias="filled($completedIcon) ? null : 'schema::components.wizard.completed-step'"
-                            :icon="$completedIcon ?? 'heroicon-o-check'"
+                            :icon="$completedIcon ?? \Filament\Support\Icons\Heroicon::OutlinedCheck"
                             x-cloak="x-cloak"
                             x-show="getStepIndex(step) > {{ $loop->index }}"
                             class="fi-fo-wizard-header-step-icon size-6 text-white"
@@ -242,7 +242,7 @@
                             fill="none"
                             preserveAspectRatio="none"
                             viewBox="0 0 22 80"
-                            class="h-full w-full text-gray-200 dark:text-white/5 rtl:rotate-180"
+                            class="h-full w-full text-gray-200 rtl:rotate-180 dark:text-white/5"
                         >
                             <path
                                 d="M0 -2L20 40L0 82"
@@ -291,12 +291,14 @@
                     })
                 "
             @endif
-            x-show="! isLastStep()"
+            x-bind:class="{ 'hidden': isLastStep(), 'block': ! isLastStep() }"
         >
             {{ $nextAction }}
         </span>
 
-        <span x-show="isLastStep()">
+        <span
+            x-bind:class="{ 'hidden': ! isLastStep(), 'block': isLastStep() }"
+        >
             {{ $getSubmitAction() }}
         </span>
     </div>

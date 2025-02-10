@@ -15,14 +15,14 @@
     }}
 >
     <nav
-        class="flex h-16 items-center bg-white px-4 shadow-sm ring-1 ring-gray-950/5 dark:bg-gray-900 dark:ring-white/10"
+        class="flex h-16 items-center bg-white px-4 ring-1 shadow-xs ring-gray-950/5 dark:bg-gray-900 dark:ring-white/10"
     >
         {{ \Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::TOPBAR_START) }}
 
         @if (filament()->hasNavigation())
             <x-filament::icon-button
                 color="gray"
-                icon="heroicon-o-bars-3"
+                :icon="\Filament\Support\Icons\Heroicon::OutlinedBars3"
                 icon-alias="panels::topbar.open-sidebar-button"
                 icon-size="lg"
                 :label="__('filament-panels::layout.actions.sidebar.expand.label')"
@@ -31,14 +31,14 @@
                 x-on:click="$store.sidebar.open()"
                 x-show="! $store.sidebar.isOpen"
                 @class([
-                    'fi-topbar-open-sidebar-btn !mx-0',
+                    'fi-topbar-open-sidebar-btn mx-0!',
                     'lg:hidden' => (! filament()->isSidebarFullyCollapsibleOnDesktop()) || filament()->isSidebarCollapsibleOnDesktop(),
                 ])
             />
 
             <x-filament::icon-button
                 color="gray"
-                icon="heroicon-o-x-mark"
+                :icon="\Filament\Support\Icons\Heroicon::OutlinedXMark"
                 icon-alias="panels::topbar.close-sidebar-button"
                 icon-size="lg"
                 :label="__('filament-panels::layout.actions.sidebar.collapse.label')"
@@ -46,7 +46,7 @@
                 x-data="{}"
                 x-on:click="$store.sidebar.close()"
                 x-show="$store.sidebar.isOpen"
-                class="fi-topbar-close-sidebar-btn !mx-0 lg:hidden"
+                class="fi-topbar-close-sidebar-btn mx-0! lg:hidden"
             />
         @endif
 
@@ -54,7 +54,7 @@
             @if (filament()->isSidebarCollapsibleOnDesktop())
                 <x-filament::icon-button
                     color="gray"
-                    :icon="$isRtl ? 'heroicon-o-chevron-left' : 'heroicon-o-chevron-right'"
+                    :icon="$isRtl ? \Filament\Support\Icons\Heroicon::OutlinedChevronLeft : \Filament\Support\Icons\Heroicon::OutlinedChevronRight"
                     {{-- @deprecated Use `panels::sidebar.expand-button.rtl` instead of `panels::sidebar.expand-button` for RTL. --}}
                     :icon-alias="$isRtl ? ['panels::sidebar.expand-button.rtl', 'panels::sidebar.expand-button'] : 'panels::sidebar.expand-button'"
                     icon-size="lg"
@@ -63,14 +63,14 @@
                     x-data="{}"
                     x-on:click="$store.sidebar.open()"
                     x-show="! $store.sidebar.isOpen"
-                    class="!mx-0"
+                    class="mx-0!"
                 />
             @endif
 
             @if (filament()->isSidebarCollapsibleOnDesktop() || filament()->isSidebarFullyCollapsibleOnDesktop())
                 <x-filament::icon-button
                     color="gray"
-                    :icon="$isRtl ? 'heroicon-o-chevron-right' : 'heroicon-o-chevron-left'"
+                    :icon="$isRtl ? \Filament\Support\Icons\Heroicon::OutlinedChevronRight : \Filament\Support\Icons\Heroicon::OutlinedChevronLeft"
                     {{-- @deprecated Use `panels::sidebar.collapse-button.rtl` instead of `panels::sidebar.collapse-button` for RTL. --}}
                     :icon-alias="$isRtl ? ['panels::sidebar.collapse-button.rtl', 'panels::sidebar.collapse-button'] : 'panels::sidebar.collapse-button'"
                     icon-size="lg"
@@ -79,7 +79,7 @@
                     x-data="{}"
                     x-on:click="$store.sidebar.close()"
                     x-show="$store.sidebar.isOpen"
-                    class="!mx-0 hidden lg:flex"
+                    class="mx-0! hidden lg:flex"
                 />
             @endif
 
@@ -98,7 +98,7 @@
             @endif
 
             @if (filament()->hasNavigation())
-                <ul class="me-4 ms-4 hidden items-center gap-x-4 lg:flex">
+                <ul class="ms-4 me-4 hidden items-center gap-x-4 lg:flex">
                     @foreach ($navigation as $group)
                         @if ($groupLabel = $group->getLabel())
                             <x-filament::dropdown

@@ -53,46 +53,46 @@ it('can fill fields on multiple forms', function () {
 
 it('can have disabled fields', function () {
     livewire(TestComponentWithForm::class)
-        ->assertFormFieldIsDisabled('disabled');
+        ->assertFormFieldDisabled('disabled');
 });
 
 it('can have disabled fields on multiple forms', function () {
     livewire(TestComponentWithMultipleForms::class)
-        ->assertFormFieldIsDisabled('disabled', 'fooForm')
-        ->assertFormFieldIsDisabled('disabled', 'barForm');
+        ->assertFormFieldDisabled('disabled', 'fooForm')
+        ->assertFormFieldDisabled('disabled', 'barForm');
 });
 
 it('can have enabled fields', function () {
     livewire(TestComponentWithForm::class)
-        ->assertFormFieldIsEnabled('enabled');
+        ->assertFormFieldEnabled('enabled');
 });
 
 it('can have enabled fields on multiple forms', function () {
     livewire(TestComponentWithMultipleForms::class)
-        ->assertFormFieldIsEnabled('enabled', 'fooForm')
-        ->assertFormFieldIsEnabled('enabled', 'barForm');
+        ->assertFormFieldEnabled('enabled', 'fooForm')
+        ->assertFormFieldEnabled('enabled', 'barForm');
 });
 
 it('can have hidden fields', function () {
     livewire(TestComponentWithForm::class)
-        ->assertFormFieldIsHidden('hidden');
+        ->assertFormFieldHidden('hidden');
 });
 
 it('can have hidden fields on multiple forms', function () {
     livewire(TestComponentWithMultipleForms::class)
-        ->assertFormFieldIsHidden('hidden', 'fooForm')
-        ->assertFormFieldIsHidden('hidden', 'barForm');
+        ->assertFormFieldHidden('hidden', 'fooForm')
+        ->assertFormFieldHidden('hidden', 'barForm');
 });
 
 it('can have visible fields', function () {
     livewire(TestComponentWithForm::class)
-        ->assertFormFieldIsVisible('visible');
+        ->assertFormFieldVisible('visible');
 });
 
 it('can have visible fields on multiple forms', function () {
     livewire(TestComponentWithMultipleForms::class)
-        ->assertFormFieldIsVisible('visible', 'fooForm')
-        ->assertFormFieldIsVisible('visible', 'barForm');
+        ->assertFormFieldVisible('visible', 'fooForm')
+        ->assertFormFieldVisible('visible', 'barForm');
 });
 
 it('has layout components', function () {

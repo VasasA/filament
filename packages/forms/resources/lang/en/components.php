@@ -396,6 +396,8 @@ return [
             'ordered_list' => 'Numbered list',
             'redo' => 'Redo',
             'strike' => 'Strikethrough',
+            'sub' => 'Subscript',
+            'sup' => 'Superscript',
             'underline' => 'Underline',
             'undo' => 'Undo',
         ],

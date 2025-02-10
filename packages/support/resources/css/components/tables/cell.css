@@ -49,7 +49,7 @@
         @apply hidden 2xl:table-cell;
     }
 
-    & > .fi-ta-col-wrp {
+    & > .fi-ta-col {
         @apply flex w-full justify-start text-start disabled:pointer-events-none;
     }
 
@@ -58,7 +58,7 @@
     }
 
     &:has(.fi-ta-actions) {
-        @apply whitespace-nowrap px-3 py-4 first-of-type:ps-4 last-of-type:pe-4 sm:first-of-type:ps-6 sm:last-of-type:pe-6;
+        @apply px-3 py-4 whitespace-nowrap first-of-type:ps-4 last-of-type:pe-4 sm:first-of-type:ps-6 sm:last-of-type:pe-6;
     }
 
     &:has(.fi-ta-record-checkbox) {
@@ -99,7 +99,7 @@
     }
 
     &.fi-ta-summary-header-cell {
-        @apply px-3 py-2 text-sm font-medium text-gray-950 dark:text-white sm:first-of-type:ps-6;
+        @apply px-3 py-2 text-sm font-medium text-gray-950 sm:first-of-type:ps-6 dark:text-white;
 
         &.fi-wrapped {
             @apply whitespace-nowrap;

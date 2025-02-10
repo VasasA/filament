@@ -4,7 +4,9 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tests\Fixtures\Livewire\PostsTable;
 use Filament\Tests\Fixtures\Models\Post;
+use Filament\Tests\Fixtures\Models\User;
 use Filament\Tests\Tables\TestCase;
+use Illuminate\Support\Str;
 
 use function Filament\Tests\livewire;
 
@@ -44,6 +46,54 @@ it('can sort records with relationship', function () {
         ->assertCanSeeTableRecords($posts->sortByDesc('author.name'), inOrder: true);
 });
 
+it('can sort records with JSON column', function () {
+    $posts = Post::factory()->count(10)->state(fn (): array => [
+        'json' => ['foo' => Str::random()],
+    ])->create();
+
+    livewire(PostsTable::class)
+        ->sortTable('json.foo')
+        ->assertCanSeeTableRecords($posts->sortBy('json.foo'), inOrder: true)
+        ->sortTable('json.foo', 'desc')
+        ->assertCanSeeTableRecords($posts->sortByDesc('json.foo'), inOrder: true);
+});
+
+it('can sort records with nested JSON column', function () {
+    $posts = Post::factory()->count(10)->state(fn (): array => [
+        'json' => ['bar' => ['baz' => Str::random()]],
+    ])->create();
+
+    livewire(PostsTable::class)
+        ->sortTable('json.bar.baz')
+        ->assertCanSeeTableRecords($posts->sortBy('json.bar.baz'), inOrder: true)
+        ->sortTable('json.bar.baz', 'desc')
+        ->assertCanSeeTableRecords($posts->sortByDesc('json.bar.baz'), inOrder: true);
+});
+
+it('can sort records with relationship JSON column', function () {
+    $posts = Post::factory()->count(10)->state(fn (): array => [
+        'author_id' => User::factory()->state(['json' => ['foo' => Str::random()]]),
+    ])->create();
+
+    livewire(PostsTable::class)
+        ->sortTable('author.json.foo')
+        ->assertCanSeeTableRecords($posts->sortBy('author.json.foo'), inOrder: true)
+        ->sortTable('author.json.foo', 'desc')
+        ->assertCanSeeTableRecords($posts->sortByDesc('author.json.foo'), inOrder: true);
+});
+
+it('can sort records with relationship nested JSON column', function () {
+    $posts = Post::factory()->count(10)->state(fn (): array => [
+        'author_id' => User::factory()->state(['json' => ['bar' => ['baz' => Str::random()]]]),
+    ])->create();
+
+    livewire(PostsTable::class)
+        ->sortTable('author.json.bar.baz')
+        ->assertCanSeeTableRecords($posts->sortBy('author.json.bar.baz'), inOrder: true)
+        ->sortTable('author.json.bar.baz', 'desc')
+        ->assertCanSeeTableRecords($posts->sortByDesc('author.json.bar.baz'), inOrder: true);
+});
+
 it('can search records', function () {
     $posts = Post::factory()->count(10)->create();
 
@@ -75,6 +125,82 @@ it('can search posts with relationship', function () {
         ->searchTable($author)
         ->assertCanSeeTableRecords($posts->where('author.name', $author))
         ->assertCanNotSeeTableRecords($posts->where('author.name', '!=', $author));
+});
+
+it('can search posts with JSON column', function () {
+    $search = Str::random();
+
+    $matchingPosts = Post::factory()->count(5)->create([
+        'json' => ['foo' => $search],
+    ]);
+
+    $notMatchingPosts = Post::factory()->count(5)->create([
+        'json' => ['foo' => Str::random()],
+    ]);
+
+    livewire(PostsTable::class)
+        ->searchTable($search)
+        ->assertCanSeeTableRecords($matchingPosts)
+        ->assertCanNotSeeTableRecords($notMatchingPosts);
+});
+
+it('can search posts with nested JSON column', function () {
+    $search = Str::random();
+
+    $matchingPosts = Post::factory()->count(5)->create([
+        'json' => ['bar' => ['baz' => $search]],
+    ]);
+
+    $notMatchingPosts = Post::factory()->count(5)->create([
+        'json' => ['bar' => ['baz' => Str::random()]],
+    ]);
+
+    livewire(PostsTable::class)
+        ->searchTable($search)
+        ->assertCanSeeTableRecords($matchingPosts)
+        ->assertCanNotSeeTableRecords($notMatchingPosts);
+});
+
+it('can search posts with relationship JSON column', function () {
+    $search = Str::random();
+
+    $matchingAuthor = User::factory()
+        ->create(['json' => ['foo' => $search]]);
+
+    $matchingPosts = Post::factory()
+        ->for($matchingAuthor, 'author')
+        ->count(5)
+        ->create();
+
+    $notMatchingPosts = Post::factory()
+        ->count(5)
+        ->create();
+
+    livewire(PostsTable::class)
+        ->searchTable($search)
+        ->assertCanSeeTableRecords($matchingPosts)
+        ->assertCanNotSeeTableRecords($notMatchingPosts);
+});
+
+it('can search posts with relationship nested JSON column', function () {
+    $search = Str::random();
+
+    $matchingAuthor = User::factory()
+        ->create(['json' => ['bar' => ['baz' => $search]]]);
+
+    $matchingPosts = Post::factory()
+        ->for($matchingAuthor, 'author')
+        ->count(5)
+        ->create();
+
+    $notMatchingPosts = Post::factory()
+        ->count(5)
+        ->create();
+
+    livewire(PostsTable::class)
+        ->searchTable($search)
+        ->assertCanSeeTableRecords($matchingPosts)
+        ->assertCanNotSeeTableRecords($notMatchingPosts);
 });
 
 it('can search individual column records with relationship', function () {
@@ -139,6 +265,46 @@ it('can state whether a column has the correct formatted value', function () {
     livewire(PostsTable::class)
         ->assertTableColumnFormattedStateSet('formatted_state', 'formatted state', $post)
         ->assertTableColumnFormattedStateNotSet('formatted_state', 'incorrect formatted state', $post);
+});
+
+it('can output JSON values', function () {
+    $post = Post::factory()->create([
+        'json' => ['foo' => 'bar'],
+    ]);
+
+    livewire(PostsTable::class)
+        ->assertTableColumnStateSet('json.foo', 'bar', $post);
+});
+
+it('can output nested JSON values', function () {
+    $post = Post::factory()->create([
+        'json' => ['bar' => ['baz' => 'qux']],
+    ]);
+
+    livewire(PostsTable::class)
+        ->assertTableColumnStateSet('json.bar.baz', 'qux', $post);
+});
+
+it('can output relationship JSON values', function () {
+    $post = Post::factory()->create([
+        'author_id' => User::factory()->state([
+            'json' => ['foo' => 'bar'],
+        ]),
+    ]);
+
+    livewire(PostsTable::class)
+        ->assertTableColumnStateSet('author.json.foo', 'bar', $post);
+});
+
+it('can output relationship nested JSON values', function () {
+    $post = Post::factory()->create([
+        'author_id' => User::factory()->state([
+            'json' => ['bar' => ['baz' => 'qux']],
+        ]),
+    ]);
+
+    livewire(PostsTable::class)
+        ->assertTableColumnStateSet('author.json.bar.baz', 'qux', $post);
 });
 
 it('can output values in a JSON array column of objects', function () {

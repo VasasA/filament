@@ -13,7 +13,7 @@ class SchemaServiceProvider extends PackageServiceProvider
     public function configurePackage(Package $package): void
     {
         $package
-            ->name('filament-schema')
+            ->name('filament-schemas')
             ->hasCommands([
                 Commands\MakeLayoutComponentCommand::class,
                 Commands\MakeLivewireSchemaCommand::class,
@@ -26,7 +26,7 @@ class SchemaServiceProvider extends PackageServiceProvider
     public function packageBooted(): void
     {
         FilamentAsset::register([
-            Js::make('schema', __DIR__ . '/../dist/index.js'),
+            Js::make('schemas', __DIR__ . '/../dist/index.js'),
         ], 'filament/support');
 
         if ($this->app->runningInConsole()) {

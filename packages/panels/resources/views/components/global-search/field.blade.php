@@ -13,7 +13,7 @@
     </label>
 
     <x-filament::input.wrapper
-        prefix-icon="heroicon-m-magnifying-glass"
+        :prefix-icon="\Filament\Support\Icons\Heroicon::MagnifyingGlass"
         prefix-icon-alias="panels::global-search.field"
         inline-prefix
         :suffix="$suffix"
@@ -23,6 +23,7 @@
         <x-filament::input
             autocomplete="off"
             inline-prefix
+            maxlength="1000"
             :placeholder="__('filament-panels::global-search.field.placeholder')"
             type="search"
             wire:key="global-search.field.input"

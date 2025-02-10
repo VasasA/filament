@@ -2,6 +2,7 @@
 
 use Filament\Actions\Action;
 use Filament\Actions\Testing\Fixtures\TestAction;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tests\Fixtures\Livewire\InfolistActions;
 use Filament\Tests\TestCase;
 use Illuminate\Support\Str;
@@ -104,12 +105,12 @@ it('can disable an action', function () {
 
 it('can have an icon', function () {
     livewire(InfolistActions::class)
-        ->assertActionHasIcon(TestAction::make('hasIcon')->schemaComponent('infolist.textEntry'), 'heroicon-m-pencil-square')
-        ->assertActionDoesNotHaveIcon(TestAction::make('hasIcon')->schemaComponent('infolist.textEntry'), 'heroicon-m-trash');
+        ->assertActionHasIcon(TestAction::make('hasIcon')->schemaComponent('infolist.textEntry'), Heroicon::PencilSquare)
+        ->assertActionDoesNotHaveIcon(TestAction::make('hasIcon')->schemaComponent('infolist.textEntry'), Heroicon::Trash);
 
     livewire(InfolistActions::class)
-        ->assertInfolistActionHasIcon('textEntry', 'hasIcon', 'heroicon-m-pencil-square')
-        ->assertInfolistActionDoesNotHaveIcon('textEntry', 'hasIcon', 'heroicon-m-trash');
+        ->assertInfolistActionHasIcon('textEntry', 'hasIcon', Heroicon::PencilSquare)
+        ->assertInfolistActionDoesNotHaveIcon('textEntry', 'hasIcon', Heroicon::Trash);
 });
 
 it('can have a label', function () {

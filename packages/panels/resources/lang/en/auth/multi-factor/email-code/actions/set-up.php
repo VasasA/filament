@@ -6,15 +6,15 @@ return [
 
     'modal' => [
 
-        'heading' => 'Set up email code authentication',
+        'heading' => 'Set up email verification codes',
 
-        'description' => 'You\'ll need to enter a code we send you by email each time you sign in. We\'ve sent you an email with a code to get started.',
+        'description' => 'You\'ll need to enter the 6-digit code we send you by email each time you sign in or perform sensitive actions. Check your email for a 6-digit code to complete the setup.',
 
         'form' => [
 
             'code' => [
 
-                'label' => 'Enter the code we sent you by email',
+                'label' => 'Enter the 6-digit code we sent you by email',
 
                 'validation_attribute' => 'code',
 
@@ -49,7 +49,7 @@ return [
         'actions' => [
 
             'submit' => [
-                'label' => 'Enable email code authentication',
+                'label' => 'Enable email verification codes',
             ],
 
         ],
@@ -59,7 +59,7 @@ return [
     'notifications' => [
 
         'enabled' => [
-            'title' => 'Email code authentication has been enabled',
+            'title' => 'Email verification codes have been enabled',
         ],
 
     ],

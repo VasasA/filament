@@ -33,7 +33,7 @@ trait BelongsToModel
 
     public function saveRelationships(): void
     {
-        foreach ($this->getComponents(withHidden: true) as $component) {
+        foreach ($this->getComponents(withActions: false, withHidden: true) as $component) {
             $component->saveRelationshipsBeforeChildren();
 
             $shouldSaveRelationshipsWhenDisabled = $component->shouldSaveRelationshipsWhenDisabled();
@@ -52,7 +52,7 @@ trait BelongsToModel
 
     public function loadStateFromRelationships(bool $andHydrate = false): void
     {
-        foreach ($this->getComponents(withHidden: true) as $component) {
+        foreach ($this->getComponents(withActions: false, withHidden: true) as $component) {
             $component->loadStateFromRelationships($andHydrate);
 
             foreach ($component->getChildComponentContainers(withHidden: true) as $container) {

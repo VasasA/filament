@@ -2,8 +2,12 @@
 
 namespace Filament\Schemas;
 
+use Closure;
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Support\Components\ViewComponent;
+use Filament\Support\Concerns\HasAlignment;
 use Filament\Support\Concerns\HasExtraAttributes;
 use Illuminate\Database\Eloquent\Model;
 use Livewire\Component;
@@ -14,21 +18,27 @@ class Schema extends ViewComponent
     use Concerns\BelongsToModel;
     use Concerns\BelongsToParentComponent;
     use Concerns\CanBeDisabled;
+    use Concerns\CanBeEmbeddedInParentComponent;
     use Concerns\CanBeHidden;
+    use Concerns\CanBeInline;
     use Concerns\CanBeValidated;
+    use Concerns\CanConfigureActions;
     use Concerns\Cloneable;
     use Concerns\HasColumns;
     use Concerns\HasComponents;
     use Concerns\HasEntryWrapper;
     use Concerns\HasFieldWrapper;
+    use Concerns\HasGap;
+    use Concerns\HasHeadings;
     use Concerns\HasInlineLabels;
     use Concerns\HasKey;
     use Concerns\HasOperation;
     use Concerns\HasState;
     use Concerns\HasStateBindingModifiers;
+    use HasAlignment;
     use HasExtraAttributes;
 
-    protected string $view = 'filament-schema::schema';
+    protected string $view = 'filament-schemas::schema';
 
     protected string $evaluationIdentifier = 'schema';
 
@@ -38,18 +48,24 @@ class Schema extends ViewComponent
 
     public static string $defaultDateDisplayFormat = 'M j, Y';
 
+    public static string $defaultIsoDateDisplayFormat = 'L';
+
     public static string $defaultDateTimeDisplayFormat = 'M j, Y H:i:s';
+
+    public static string $defaultIsoDateTimeDisplayFormat = 'LLL';
 
     public static ?string $defaultNumberLocale = null;
 
     public static string $defaultTimeDisplayFormat = 'H:i:s';
 
-    final public function __construct(Component & HasSchemas $livewire)
+    public static string $defaultIsoTimeDisplayFormat = 'LT';
+
+    final public function __construct((Component & HasSchemas) | null $livewire = null)
     {
         $this->livewire($livewire);
     }
 
-    public static function make(Component & HasSchemas $livewire): static
+    public static function make((Component & HasSchemas) | null $livewire = null): static
     {
         $static = app(static::class, ['livewire' => $livewire]);
         $static->configure();
@@ -90,5 +106,35 @@ class Schema extends ViewComponent
             Model::class, $record::class => [$record],
             default => parent::resolveDefaultClosureDependencyForEvaluationByType($parameterType),
         };
+    }
+
+    /**
+     * @param  array<Component | Action | ActionGroup | string> | Schema | Component | Action | ActionGroup | string | Closure  $components
+     */
+    public static function start(array | Schema | Component | Action | ActionGroup | string | Closure $components): static
+    {
+        return static::make()
+            ->components($components)
+            ->alignStart();
+    }
+
+    /**
+     * @param  array<Component | Action | ActionGroup | string> | Schema | Component | Action | ActionGroup | string | Closure  $components
+     */
+    public static function end(array | Schema | Component | Action | ActionGroup | string | Closure $components): static
+    {
+        return static::make()
+            ->components($components)
+            ->alignEnd();
+    }
+
+    /**
+     * @param  array<Component | Action | ActionGroup | string> | Schema | Component | Action | ActionGroup | string | Closure  $components
+     */
+    public static function between(array | Schema | Component | Action | ActionGroup | string | Closure $components): static
+    {
+        return static::make()
+            ->components($components)
+            ->alignBetween();
     }
 }

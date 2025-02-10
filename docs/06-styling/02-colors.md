@@ -159,11 +159,11 @@ FilamentColor::register([
 The shade in which a component uses for a particular property such as its background color, text color or border color is defined within the element's CSS definition. If you inspect a particular element, you may see that its CSS contains something such as:
 
 ```css
-.fi-btn.fi-color-custom {
+.fi-btn.fi-color {
     background-color: rgba(var(--c-600), var(--tw-bg-opacity));
 }
 
-.fi-btn.fi-color-custom:hover {
+.fi-btn.fi-color:hover {
     background-color: rgba(var(--c-500), var(--tw-bg-opacity));
 }
 ```
@@ -171,7 +171,7 @@ The shade in which a component uses for a particular property such as its backgr
 This is compiled from the Tailwind CSS `@apply` statements that Filament uses in its base CSS file:
 
 ```css
-.fi-btn.fi-color-custom {
+.fi-btn.fi-color {
     @apply bg-custom-600 hover:bg-custom-500;
 }
 ```
@@ -184,16 +184,16 @@ The `custom` part of those Tailwind classes translates to those `--c-500` and `-
         --c-500: var(--primary-500);
         --c-600: var(--primary-600);
     "
-    class="fi-btn fi-color-custom"
+    class="fi-btn fi-color"
 >
     <!-- ... -->
 </button>
 ```
 
-Imagine you wanted to swap the background shades for this element, so that the `600` shade is used when the element is hovered, and the `500` shade is used when it is not. You can do this using [CSS hooks](css-hooks) in the same way as any other CSS property. In this case, you want to target the `.fi-btn.fi-color-custom` selector in your CSS file:
+Imagine you wanted to swap the background shades for this element, so that the `600` shade is used when the element is hovered, and the `500` shade is used when it is not. You can do this using [CSS hooks](css-hooks) in the same way as any other CSS property. In this case, you want to target the `.fi-btn.fi-color` selector in your CSS file:
 
 ```css
-.fi-btn.fi-color-custom {
+.fi-btn.fi-color {
     @apply bg-custom-500 hover:bg-custom-600;
 }
 ```
@@ -211,7 +211,7 @@ FilamentColor::addShades('button', [700, 800]);
 This will add the `700` and `800` shades to the `style` attribute of all elements that use the `button` alias. You can now use those shades in your CSS:
 
 ```css
-.fi-btn.fi-color-custom {
+.fi-btn.fi-color {
     @apply bg-custom-800 hover:bg-custom-700;
 }
 ```

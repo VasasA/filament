@@ -1,6 +1,9 @@
 @php
     use Filament\Support\Enums\ActionSize;
     use Filament\Support\Enums\IconSize;
+    use Filament\Support\View\Components\Badge;
+    use Filament\Support\View\Components\Dropdown\Item;
+    use Filament\Support\View\Components\Dropdown\Item\Icon;
     use Illuminate\View\ComponentAttributeBag;
 @endphp
 
@@ -25,28 +28,14 @@
 ])
 
 @php
-    if (! $iconSize instanceof IconSize) {
-        $iconSize = filled($iconSize) ? (IconSize::tryFrom($iconSize) ?? $iconSize) : null;
+    if (filled($iconSize) && (! $iconSize instanceof IconSize)) {
+        $iconSize = IconSize::tryFrom($iconSize) ?? $iconSize;
     }
 
     $iconColor ??= $color;
 
     $iconClasses = \Illuminate\Support\Arr::toCssClasses([
-        'fi-dropdown-list-item-icon',
-        ($iconSize instanceof IconSize) ? ('fi-size-' . $iconSize->value) : (is_string($iconSize) ? $iconSize : ''),
-        match ($iconColor) {
-            'gray' => '',
-            default => 'fi-color-custom',
-        },
-        is_string($iconColor) ? "fi-color-{$iconColor}" : null,
-    ]);
-
-    $iconStyles = \Illuminate\Support\Arr::toCssStyles([
-        \Filament\Support\get_color_css_variables(
-            $iconColor,
-            shades: [400, 500],
-            alias: 'dropdown.list.item.icon',
-        ) => $iconColor !== 'gray',
+        ...\Filament\Support\get_component_color_classes(Icon::class, $iconColor),
     ]);
 
     $wireTarget = $loadingIndicator ? $attributes->whereStartsWith(['wire:target', 'wire:click'])->filter(fn ($value): bool => filled($value))->first() : null;
@@ -104,19 +93,8 @@
             ->class([
                 'fi-dropdown-list-item',
                 'fi-disabled' => $disabled,
-                match ($color) {
-                    'gray' => '',
-                    default => 'fi-color-custom',
-                },
-                is_string($color) ? "fi-color-{$color}" : null,
             ])
-            ->style([
-                \Filament\Support\get_color_css_variables(
-                    $color,
-                    shades: [50, 400],
-                    alias: 'dropdown.list.item',
-                ) => $color !== 'gray',
-            ])
+            ->color(Item::class, $color)
     }}
 >
     @if ($icon)
@@ -124,7 +102,7 @@
             \Filament\Support\generate_icon_html($icon, $iconAlias, (new ComponentAttributeBag([
                 'wire:loading.remove.delay.' . config('filament.livewire_loading_delay', 'default') => $hasLoadingIndicator,
                 'wire:target' => $hasLoadingIndicator ? $loadingIndicatorTarget : false,
-            ]))->class([$iconClasses])->style([$iconStyles]))
+            ]))->class([$iconClasses]), size: $iconSize)
         }}
     @endif
 
@@ -144,53 +122,33 @@
             \Filament\Support\generate_loading_indicator_html((new ComponentAttributeBag([
                 'wire:loading.delay.' . config('filament.livewire_loading_delay', 'default') => '',
                 'wire:target' => $loadingIndicatorTarget,
-            ]))->class([$iconClasses])->style([$iconStyles]))
+            ]))->class([$iconClasses]), size: $iconSize)
         }}
     @endif
 
-    <span
-        class="fi-dropdown-list-item-label"
-        @style([
-            \Filament\Support\get_color_css_variables(
-                $color,
-                shades: [400, 600],
-                alias: 'dropdown.list.item.label',
-            ) => $color !== 'gray',
-        ])
-    >
+    <span class="fi-dropdown-list-item-label">
         {{ $slot }}
     </span>
 
     @if (filled($badge))
-        <span
-            @if ($badgeTooltip)
-                x-tooltip="{
-                    content: @js($badgeTooltip),
-                    theme: $store.theme,
-                }"
-            @endif
-            @class([
-                'fi-badge',
-                match ($badgeColor) {
-                    'gray' => '',
-                    default => 'fi-color-custom',
-                },
-                is_string($badgeColor) ? "fi-color-{$badgeColor}" : null,
-            ])
-            @style([
-                \Filament\Support\get_color_css_variables(
-                    $badgeColor,
-                    shades: [
-                        50,
-                        400,
-                        600,
-                    ],
-                    alias: 'badge',
-                ) => $badgeColor !== 'gray',
-            ])
-        >
+        @if ($badge instanceof \Illuminate\View\ComponentSlot)
             {{ $badge }}
-        </span>
+        @else
+            <span
+                @if ($badgeTooltip)
+                    x-tooltip="{
+                        content: @js($badgeTooltip),
+                        theme: $store.theme,
+                    }"
+                @endif
+                @class([
+                    'fi-badge',
+                    ...\Filament\Support\get_component_color_classes(Badge::class, $badgeColor),
+                ])
+            >
+                {{ $badge }}
+            </span>
+        @endif
     @endif
 </{{ ($tag === 'form') ? 'button' : $tag }}>
 

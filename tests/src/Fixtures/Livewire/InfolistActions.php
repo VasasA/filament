@@ -12,6 +12,7 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Concerns\InteractsWithInfolists;
 use Filament\Infolists\Contracts\HasInfolists;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
 
@@ -54,7 +55,7 @@ class InfolistActions extends Component implements HasActions, HasForms, HasInfo
                             ->disabled(),
                         Action::make('enabled'),
                         Action::make('hasIcon')
-                            ->icon('heroicon-m-pencil-square'),
+                            ->icon(Heroicon::PencilSquare),
                         Action::make('hasLabel')
                             ->label('My Action'),
                         Action::make('hasColor')

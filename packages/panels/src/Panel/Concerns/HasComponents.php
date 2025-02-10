@@ -5,7 +5,6 @@ namespace Filament\Panel\Concerns;
 use Closure;
 use Filament\Auth\Pages\EditProfile;
 use Filament\Clusters\Cluster;
-use Filament\Livewire\DatabaseNotifications;
 use Filament\Livewire\GlobalSearch;
 use Filament\Livewire\Notifications;
 use Filament\Livewire\Sidebar;
@@ -245,7 +244,7 @@ trait HasComponents
 
         $this->discoverComponents(
             Cluster::class,
-            $this->clusters,
+            $this->clusters, /** @phpstan-ignore assign.propertyType */
             directory: $in,
             namespace: $for,
         );
@@ -335,7 +334,7 @@ trait HasComponents
 
         $this->discoverComponents(
             Widget::class,
-            $this->widgets,
+            $this->widgets, /** @phpstan-ignore assign.propertyType */
             directory: $in,
             namespace: $for,
         );
@@ -449,7 +448,7 @@ trait HasComponents
                 $this->queueLivewireComponentForRegistration($class);
             }
 
-            if (! is_subclass_of($class, $baseClass)) {
+            if (! is_subclass_of($class, $baseClass)) { /** @phpstan-ignore function.alreadyNarrowedType */
                 continue;
             }
 
@@ -460,7 +459,7 @@ trait HasComponents
                 continue;
             }
 
-            $register[$file->getRealPath()] = $class;
+            $register[$file->getRealPath()] = $class; /** @phpstan-ignore parameterByRef.type */
             $this->registerToCluster($class);
         }
     }
@@ -484,7 +483,7 @@ trait HasComponents
     protected function registerLivewireComponents(): void
     {
         if (! $this->hasCachedComponents()) {
-            $this->queueLivewireComponentForRegistration(DatabaseNotifications::class);
+            $this->queueLivewireComponentForRegistration($this->getDatabaseNotificationsLivewireComponent());
             $this->queueLivewireComponentForRegistration(EditProfile::class);
             $this->queueLivewireComponentForRegistration(GlobalSearch::class);
             $this->queueLivewireComponentForRegistration(Notifications::class);
@@ -498,6 +497,10 @@ trait HasComponents
 
             if ($this->hasLogin() && is_subclass_of($loginRouteAction = $this->getLoginRouteAction(), Component::class)) {
                 $this->queueLivewireComponentForRegistration($loginRouteAction);
+            }
+
+            if ($this->isMultiFactorAuthenticationRequired() && is_subclass_of($setUpRequiredMultiFactorAuthenticationRouteAction = $this->getSetUpRequiredMultiFactorAuthenticationRouteAction(), Component::class)) {
+                $this->queueLivewireComponentForRegistration($setUpRequiredMultiFactorAuthenticationRouteAction);
             }
 
             if ($this->hasPasswordReset()) {

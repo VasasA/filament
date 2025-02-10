@@ -3,7 +3,7 @@
         {{
             $attributes
                 ->merge($getExtraAttributes(), escape: false)
-                ->class(['fi-in-key-value w-full rounded-lg bg-white shadow-sm ring-1 ring-gray-950/5 dark:bg-white/5 dark:ring-white/10'])
+                ->class(['fi-in-key-value w-full rounded-lg bg-white ring-1 shadow-xs ring-gray-950/5 dark:bg-white/5 dark:ring-white/10'])
         }}
     >
         <table
@@ -28,11 +28,11 @@
             </thead>
 
             <tbody
-                class="divide-y divide-gray-200 font-mono text-base dark:divide-white/5 sm:text-sm sm:leading-6"
+                class="divide-y divide-gray-200 font-mono text-base sm:text-sm sm:leading-6 dark:divide-white/5"
             >
                 @forelse (($getState() ?? []) as $key => $value)
                     <tr
-                        class="divide-x divide-gray-200 dark:divide-white/5 rtl:divide-x-reverse"
+                        class="divide-x divide-gray-200 rtl:divide-x-reverse dark:divide-white/5"
                     >
                         <td class="w-1/2 px-3 py-1.5">
                             {{ $key }}

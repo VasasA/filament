@@ -31,13 +31,13 @@ it('can generate new recovery codes when valid challenge code is used', function
     livewire(EditProfile::class)
         ->callAction(
             TestAction::make('regenerateGoogleTwoFactorAuthenticationRecoveryCodes')
-                ->schemaComponent('content.google_two_factor.regenerateGoogleTwoFactorAuthenticationRecoveryCodesAction'),
+                ->schemaComponent('content.google_two_factor'),
             ['code' => $googleTwoFactorAuthentication->getCurrentCode($user)],
         )
         ->assertHasNoActionErrors()
         ->assertActionMounted([
             TestAction::make('regenerateGoogleTwoFactorAuthenticationRecoveryCodes')
-                ->schemaComponent('content.google_two_factor.regenerateGoogleTwoFactorAuthenticationRecoveryCodesAction'),
+                ->schemaComponent('content.google_two_factor'),
             TestAction::make('showNewRecoveryCodes')
                 ->arguments(function (array $actualArguments): bool {
                     if (blank($actualArguments['recoveryCodes'] ?? null)) {
@@ -76,13 +76,13 @@ it('can generate new recovery codes when the current user\'s password is used', 
     livewire(EditProfile::class)
         ->callAction(
             TestAction::make('regenerateGoogleTwoFactorAuthenticationRecoveryCodes')
-                ->schemaComponent('content.google_two_factor.regenerateGoogleTwoFactorAuthenticationRecoveryCodesAction'),
+                ->schemaComponent('content.google_two_factor'),
             ['password' => 'password'],
         )
         ->assertHasNoActionErrors()
         ->assertActionMounted([
             TestAction::make('regenerateGoogleTwoFactorAuthenticationRecoveryCodes')
-                ->schemaComponent('content.google_two_factor.regenerateGoogleTwoFactorAuthenticationRecoveryCodesAction'),
+                ->schemaComponent('content.google_two_factor'),
             TestAction::make('showNewRecoveryCodes')
                 ->arguments(function (array $actualArguments): bool {
                     if (blank($actualArguments['recoveryCodes'] ?? null)) {
@@ -123,13 +123,13 @@ it('will not generate new recovery codes when an invalid code is used', function
     livewire(EditProfile::class)
         ->callAction(
             TestAction::make('regenerateGoogleTwoFactorAuthenticationRecoveryCodes')
-                ->schemaComponent('content.google_two_factor.regenerateGoogleTwoFactorAuthenticationRecoveryCodesAction'),
+                ->schemaComponent('content.google_two_factor'),
             ['code' => ($googleTwoFactorAuthentication->getCurrentCode($user) === '000000') ? '111111' : '000000'],
         )
         ->assertHasActionErrors()
         ->assertActionNotMounted([
             TestAction::make('regenerateGoogleTwoFactorAuthenticationRecoveryCodes')
-                ->schemaComponent('content.google_two_factor.regenerateGoogleTwoFactorAuthenticationRecoveryCodesAction'),
+                ->schemaComponent('content.google_two_factor'),
             TestAction::make('showNewRecoveryCodes'),
         ]);
 
@@ -145,7 +145,7 @@ test('codes are required without the user\'s current password', function () {
     livewire(EditProfile::class)
         ->callAction(
             TestAction::make('regenerateGoogleTwoFactorAuthenticationRecoveryCodes')
-                ->schemaComponent('content.google_two_factor.regenerateGoogleTwoFactorAuthenticationRecoveryCodesAction'),
+                ->schemaComponent('content.google_two_factor'),
             ['code' => ''],
         )
         ->assertHasActionErrors([
@@ -153,7 +153,7 @@ test('codes are required without the user\'s current password', function () {
         ])
         ->assertActionNotMounted([
             TestAction::make('regenerateGoogleTwoFactorAuthenticationRecoveryCodes')
-                ->schemaComponent('content.google_two_factor.regenerateGoogleTwoFactorAuthenticationRecoveryCodesAction'),
+                ->schemaComponent('content.google_two_factor'),
             TestAction::make('showNewRecoveryCodes'),
         ]);
 
@@ -171,7 +171,7 @@ test('codes must be 6 digits', function () {
     livewire(EditProfile::class)
         ->callAction(
             TestAction::make('regenerateGoogleTwoFactorAuthenticationRecoveryCodes')
-                ->schemaComponent('content.google_two_factor.regenerateGoogleTwoFactorAuthenticationRecoveryCodesAction'),
+                ->schemaComponent('content.google_two_factor'),
             ['code' => Str::limit($googleTwoFactorAuthentication->getCurrentCode($user), limit: 5, end: '')],
         )
         ->assertHasActionErrors([
@@ -179,7 +179,7 @@ test('codes must be 6 digits', function () {
         ])
         ->assertActionNotMounted([
             TestAction::make('regenerateGoogleTwoFactorAuthenticationRecoveryCodes')
-                ->schemaComponent('content.google_two_factor.regenerateGoogleTwoFactorAuthenticationRecoveryCodesAction'),
+                ->schemaComponent('content.google_two_factor'),
             TestAction::make('showNewRecoveryCodes'),
         ]);
 
@@ -195,7 +195,7 @@ test('the user\'s current password must be valid', function () {
     livewire(EditProfile::class)
         ->callAction(
             TestAction::make('regenerateGoogleTwoFactorAuthenticationRecoveryCodes')
-                ->schemaComponent('content.google_two_factor.regenerateGoogleTwoFactorAuthenticationRecoveryCodesAction'),
+                ->schemaComponent('content.google_two_factor'),
             ['password' => 'incorrect-password'],
         )
         ->assertHasActionErrors([
@@ -203,7 +203,7 @@ test('the user\'s current password must be valid', function () {
         ])
         ->assertActionNotMounted([
             TestAction::make('regenerateGoogleTwoFactorAuthenticationRecoveryCodes')
-                ->schemaComponent('content.google_two_factor.regenerateGoogleTwoFactorAuthenticationRecoveryCodesAction'),
+                ->schemaComponent('content.google_two_factor'),
             TestAction::make('showNewRecoveryCodes'),
         ]);
 

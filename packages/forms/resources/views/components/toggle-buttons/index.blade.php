@@ -1,5 +1,6 @@
 @php
     use Filament\Support\Enums\GridDirection;
+    use Illuminate\View\ComponentAttributeBag;
 
     $gridDirection = $getGridDirection() ?? GridDirection::Column;
     $hasInlineLabel = $hasInlineLabel();
@@ -8,6 +9,7 @@
     $isInline = $isInline();
     $isMultiple = $isMultiple();
     $statePath = $getStatePath();
+    $areButtonLabelsHidden = $areButtonLabelsHidden();
 @endphp
 
 <x-dynamic-component
@@ -64,6 +66,7 @@
                     :disabled="$shouldOptionBeDisabled"
                     :for="$inputId"
                     :icon="$getIcon($value)"
+                    :label-sr-only="$areButtonLabelsHidden"
                     tag="label"
                 >
                     {{ $label }}

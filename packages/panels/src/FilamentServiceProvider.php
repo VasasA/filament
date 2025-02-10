@@ -104,7 +104,7 @@ class FilamentServiceProvider extends PackageServiceProvider
             SetUpPanel::class,
         ]);
 
-        Filament::serving(function () {
+        Filament::serving(function (): void {
             Filament::setServingStatus();
         });
 

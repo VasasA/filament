@@ -3,6 +3,8 @@
 namespace Filament\Schemas\Concerns;
 
 use Closure;
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Schema;
 use Filament\Support\Components\Attributes\ExposedLivewireMethod;
@@ -22,7 +24,7 @@ trait InteractsWithSchemas
     use WithFileUploads;
 
     /**
-     * @var array <string, TemporaryUploadedFile | null>
+     * @var array <string, TemporaryUploadedFile | array<TemporaryUploadedFile> | null>
      */
     public array $componentFileAttachments = [];
 
@@ -82,11 +84,6 @@ trait InteractsWithSchemas
         $this->getSchemaComponent($componentKey)?->partiallyRender();
     }
 
-    public function getSchemaComponentFileAttachment(string $componentKey): ?TemporaryUploadedFile
-    {
-        return data_get($this->componentFileAttachments, $componentKey);
-    }
-
     /**
      * @return class-string<TranslatableContentDriver> | null
      */
@@ -130,7 +127,7 @@ trait InteractsWithSchemas
         }
     }
 
-    public function getSchemaComponent(string $key): ?Component
+    public function getSchemaComponent(string $key, bool $withHidden = false, ?Component $skipComponentChildContainersWhileSearching = null): Component | Action | ActionGroup | null
     {
         if (! str($key)->contains('.')) {
             return null;
@@ -140,7 +137,7 @@ trait InteractsWithSchemas
 
         $schema = $this->getSchema($schemaName);
 
-        return $schema?->getComponent($key, isAbsoluteKey: true);
+        return $schema?->getComponent($key, withHidden: $withHidden, isAbsoluteKey: true, skipComponentChildContainersWhileSearching: $skipComponentChildContainersWhileSearching);
     }
 
     protected function cacheSchema(string $name, Schema | Closure | null $schema = null): ?Schema

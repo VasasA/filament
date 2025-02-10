@@ -11,8 +11,8 @@ use Filament\Facades\Filament;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Pages\SimplePage;
+use Filament\Schemas\Components\Actions;
 use Filament\Schemas\Components\Component;
-use Filament\Schemas\Components\Decorations\FormActionsDecorations;
 use Filament\Schemas\Components\Form;
 use Filament\Schemas\Components\NestedSchema;
 use Filament\Schemas\Components\RenderHook;
@@ -76,7 +76,7 @@ class ResetPassword extends SimplePage
 
         $status = Password::broker(Filament::getAuthPasswordBroker())->reset(
             $data,
-            function (CanResetPassword | Model | Authenticatable $user) use ($data) {
+            function (CanResetPassword | Model | Authenticatable $user) use ($data): void {
                 $user->forceFill([
                     'password' => Hash::make($data['password']),
                     'remember_token' => Str::random(60),
@@ -117,9 +117,9 @@ class ResetPassword extends SimplePage
             ->danger();
     }
 
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 $this->getEmailFormComponent(),
                 $this->getPasswordFormComponent(),
@@ -204,8 +204,10 @@ class ResetPassword extends SimplePage
         return Form::make([NestedSchema::make('form')])
             ->id('form')
             ->livewireSubmitHandler('resetPassword')
-            ->footer(FormActionsDecorations::make($this->getFormActions())
-                ->alignment($this->getFormActionsAlignment())
-                ->fullWidth($this->hasFullWidthFormActions()));
+            ->footer([
+                Actions::make($this->getFormActions())
+                    ->alignment($this->getFormActionsAlignment())
+                    ->fullWidth($this->hasFullWidthFormActions()),
+            ]);
     }
 }

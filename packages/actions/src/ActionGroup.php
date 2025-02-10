@@ -2,6 +2,7 @@
 
 namespace Filament\Actions;
 
+use BackedEnum;
 use Closure;
 use Exception;
 use Filament\Actions\Concerns\InteractsWithRecord;
@@ -12,19 +13,21 @@ use Filament\Support\Concerns\HasColor;
 use Filament\Support\Concerns\HasExtraAttributes;
 use Filament\Support\Concerns\HasIcon;
 use Filament\Support\Concerns\HasTooltip;
-use Filament\Support\Enums\MaxWidth;
+use Filament\Support\Enums\Width;
 use Filament\Support\Facades\FilamentIcon;
+use Filament\Support\Icons\Heroicon;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Illuminate\View\ComponentAttributeBag;
 use Illuminate\View\ComponentSlot;
-use Livewire\Component;
 
 class ActionGroup extends ViewComponent implements Arrayable, HasEmbeddedView
 {
     use Concerns\BelongsToGroup;
+    use Concerns\BelongsToLivewire;
+    use Concerns\BelongsToSchemaComponent;
     use Concerns\BelongsToTable;
     use Concerns\CanBeHidden {
         isHidden as baseIsHidden;
@@ -63,8 +66,6 @@ class ActionGroup extends ViewComponent implements Arrayable, HasEmbeddedView
      * @var array<string, Action>
      */
     protected array $flatActions;
-
-    protected Component $livewire;
 
     protected string $evaluationIdentifier = 'group';
 
@@ -188,22 +189,6 @@ class ActionGroup extends ViewComponent implements Arrayable, HasEmbeddedView
         return $this->getTriggerView() === static::LINK_VIEW;
     }
 
-    public function livewire(Component $livewire): static
-    {
-        $this->livewire = $livewire;
-
-        return $this;
-    }
-
-    public function getLivewire(): object
-    {
-        if (isset($this->livewire)) {
-            return $this->livewire;
-        }
-
-        return $this->getGroup()?->getLivewire();
-    }
-
     public function getLabel(): string
     {
         $label = $this->evaluate($this->label) ?? __('filament-actions::group.trigger.label');
@@ -230,9 +215,9 @@ class ActionGroup extends ViewComponent implements Arrayable, HasEmbeddedView
         return $this->flatActions;
     }
 
-    public function getIcon(): string
+    public function getIcon(): string | BackedEnum
     {
-        return $this->getBaseIcon() ?? FilamentIcon::resolve('actions::action-group') ?? 'heroicon-m-ellipsis-vertical';
+        return $this->getBaseIcon() ?? FilamentIcon::resolve('actions::action-group') ?? Heroicon::EllipsisVertical;
     }
 
     public function isHidden(): bool
@@ -394,7 +379,7 @@ class ActionGroup extends ViewComponent implements Arrayable, HasEmbeddedView
         $panelAttributes = (new ComponentAttributeBag)
             ->class([
                 'fi-dropdown-panel',
-                ($width instanceof MaxWidth) ? "fi-width-{$width->value}" : (is_string($width) ? $width : 'fi-width-default'),
+                ($width instanceof Width) ? "fi-width-{$width->value}" : (is_string($width) ? $width : 'fi-width-default'),
                 'fi-scrollable' => $maxHeight,
             ])
             ->style([
@@ -413,7 +398,7 @@ class ActionGroup extends ViewComponent implements Arrayable, HasEmbeddedView
 
             <div
                 x-cloak
-                x-float.placement.<?= $this->getDropdownPlacement() ?? 'bottom-start' ?>.teleport.offset="{ offset: <?= $this->getDropdownOffset() ?? 8 ?> }"
+                x-float.placement.<?= $this->getDropdownPlacement() ?? 'bottom-start' ?>.offset="{ offset: <?= $this->getDropdownOffset() ?? 8 ?> }"
                 x-ref="panel"
                 x-transition:enter-start="fi-opacity-0"
                 x-transition:leave-end="fi-opacity-0"
@@ -582,6 +567,27 @@ class ActionGroup extends ViewComponent implements Arrayable, HasEmbeddedView
         return $this->triggerViewInstance ??= view(
             $this->getTriggerView(),
             $this->getTriggerViewData(),
+        );
+    }
+
+    public function getClone(): static
+    {
+        $clone = clone $this;
+        $clone->cloneActions();
+
+        return $clone;
+    }
+
+    protected function cloneActions(): void
+    {
+        $this->actions = array_map(
+            fn (Action | ActionGroup $action): Action | ActionGroup => $action->getClone()->group($this),
+            $this->actions,
+        );
+
+        $this->flatActions = array_map(
+            fn (Action $action): Action => $action->getClone()->group($this),
+            $this->flatActions,
         );
     }
 }

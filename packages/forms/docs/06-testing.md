@@ -160,55 +160,55 @@ it('does not have a conditional field', function () {
 
 ### Hidden fields
 
-To ensure that a field is visible, pass the name to `assertFormFieldIsVisible()`:
+To ensure that a field is visible, pass the name to `assertFormFieldVisible()`:
 
 ```php
 use function Pest\Livewire\livewire;
 
 test('title is visible', function () {
     livewire(CreatePost::class)
-        ->assertFormFieldIsVisible('title');
+        ->assertFormFieldVisible('title');
 });
 ```
 
-Or to ensure that a field is hidden you can pass the name to `assertFormFieldIsHidden()`:
+Or to ensure that a field is hidden you can pass the name to `assertFormFieldHidden()`:
 
 ```php
 use function Pest\Livewire\livewire;
 
 test('title is hidden', function () {
     livewire(CreatePost::class)
-        ->assertFormFieldIsHidden('title');
+        ->assertFormFieldHidden('title');
 });
 ```
 
-> For both `assertFormFieldIsHidden()` and `assertFormFieldIsVisible()` you can pass the name of a specific form the field belongs to as the second argument like `assertFormFieldIsHidden('title', 'createPostForm')`.
+> For both `assertFormFieldHidden()` and `assertFormFieldVisible()` you can pass the name of a specific form the field belongs to as the second argument like `assertFormFieldHidden('title', 'createPostForm')`.
 
 ### Disabled fields
 
-To ensure that a field is enabled, pass the name to `assertFormFieldIsEnabled()`:
+To ensure that a field is enabled, pass the name to `assertFormFieldEnabled()`:
 
 ```php
 use function Pest\Livewire\livewire;
 
 test('title is enabled', function () {
     livewire(CreatePost::class)
-        ->assertFormFieldIsEnabled('title');
+        ->assertFormFieldEnabled('title');
 });
 ```
 
-Or to ensure that a field is disabled you can pass the name to `assertFormFieldIsDisabled()`:
+Or to ensure that a field is disabled you can pass the name to `assertFormFieldDisabled()`:
 
 ```php
 use function Pest\Livewire\livewire;
 
 test('title is disabled', function () {
     livewire(CreatePost::class)
-        ->assertFormFieldIsDisabled('title');
+        ->assertFormFieldDisabled('title');
 });
 ```
 
-> For both `assertFormFieldIsEnabled()` and `assertFormFieldIsDisabled()` you can pass the name of a specific form the field belongs to as the second argument like `assertFormFieldIsEnabled('title', 'createPostForm')`.
+> For both `assertFormFieldEnabled()` and `assertFormFieldDisabled()` you can pass the name of a specific form the field belongs to as the second argument like `assertFormFieldEnabled('title', 'createPostForm')`.
 
 ## Layout components
 

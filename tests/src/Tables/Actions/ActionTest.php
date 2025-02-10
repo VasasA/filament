@@ -4,6 +4,7 @@ use Filament\Actions\Action;
 use Filament\Actions\AttachAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\Testing\Fixtures\TestAction;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tests\Fixtures\Livewire\PostsTable;
 use Filament\Tests\Fixtures\Models\Post;
 use Filament\Tests\Tables\TestCase;
@@ -320,12 +321,12 @@ it('can disable an action', function () {
 
 it('can have an icon', function () {
     livewire(PostsTable::class)
-        ->assertActionHasIcon(TestAction::make('hasIcon')->table(), 'heroicon-m-pencil-square')
-        ->assertActionDoesNotHaveIcon(TestAction::make('hasIcon')->table(), 'heroicon-m-trash');
+        ->assertActionHasIcon(TestAction::make('hasIcon')->table(), Heroicon::PencilSquare)
+        ->assertActionDoesNotHaveIcon(TestAction::make('hasIcon')->table(), Heroicon::Trash);
 
     livewire(PostsTable::class)
-        ->assertTableActionHasIcon('hasIcon', 'heroicon-m-pencil-square')
-        ->assertTableActionDoesNotHaveIcon('hasIcon', 'heroicon-m-trash');
+        ->assertTableActionHasIcon('hasIcon', Heroicon::PencilSquare)
+        ->assertTableActionDoesNotHaveIcon('hasIcon', Heroicon::Trash);
 });
 
 it('can have a label', function () {

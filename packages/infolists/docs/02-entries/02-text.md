@@ -47,6 +47,15 @@ TextEntry::make('created_at')
     ->dateTime()
 ```
 
+You may use also the `isoDate()` and `isoDateTime()` methods to format the entry's state using [PHP date formatting macro-formats](https://carbon.nesbot.com/docs/#available-macro-formats):
+
+```php
+use Filament\Infolists\Components\TextEntry;
+
+TextEntry::make('created_at')
+    ->isoDateTime()
+```
+
 You may use the `since()` method to format the entry's state using [Carbon's `diffForHumans()`](https://carbon.nesbot.com/docs/#api-humandiff):
 
 ```php
@@ -56,7 +65,7 @@ TextEntry::make('created_at')
     ->since()
 ```
 
-Additionally, you can use the `dateTooltip()`, `dateTimeTooltip()` or `timeTooltip()` method to display a formatted date in a tooltip, often to provide extra information:
+Additionally, you can use the `dateTooltip()`, `dateTimeTooltip()`, `timeTooltip()`, `isoDateTooltip()`, `isoDateTimeTooltip()`, `isoTime()` or `isoTimeTooltip()` method to display a formatted date in a tooltip, often to provide extra information:
 
 ```php
 use Filament\Infolists\Components\TextEntry;
@@ -372,10 +381,10 @@ Text columns have small font size by default, but you may change this to `TextEn
 For instance, you may make the text larger using `size(TextEntrySize::Large)`:
 
 ```php
-use Filament\Infolists\Components\TextEntry;
+use Filament\Support\Enums\TextSize;
 
 TextEntry::make('title')
-    ->size(TextEntry\Enums\TextEntrySize::Large)
+    ->size(TextSize::Large)
 ```
 
 <AutoScreenshot name="infolists/entries/text/large" alt="Text entry in a large font size" version="4.x" />

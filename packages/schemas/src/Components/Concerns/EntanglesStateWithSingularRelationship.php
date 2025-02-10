@@ -30,7 +30,7 @@ trait EntanglesStateWithSingularRelationship
         $this->relationship = $name;
         $this->statePath($name);
 
-        $this->loadStateFromRelationshipsUsing(static function (Component | CanEntangleWithSingularRelationships $component) {
+        $this->loadStateFromRelationshipsUsing(static function (Component | CanEntangleWithSingularRelationships $component): void {
             $component->clearCachedExistingRecord();
 
             $component->fillFromRelationship();
@@ -157,9 +157,13 @@ trait EntanglesStateWithSingularRelationship
     /**
      * @param  array-key  $key
      */
-    public function getChildComponentContainer($key = null): Schema
+    public function getChildComponentContainer($key = null): ?Schema
     {
         $container = parent::getChildComponentContainer($key);
+
+        if (! $container) {
+            return null;
+        }
 
         $relationship = $this->getRelationship();
 

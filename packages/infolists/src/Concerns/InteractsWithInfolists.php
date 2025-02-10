@@ -18,9 +18,9 @@ trait InteractsWithInfolists
     /**
      * @deprecated Use `cacheSchema()` instead.
      */
-    protected function cacheInfolist(string $name, Schema $infolist): ?Schema
+    protected function cacheInfolist(string $name, Schema $schema): ?Schema
     {
-        return $this->cacheSchema($name, $infolist);
+        return $this->cacheSchema($name, $schema);
     }
 
     /**

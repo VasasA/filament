@@ -79,6 +79,8 @@ it('will authenticate the user after a valid challenge code is used', function (
 });
 
 it('can resend the code to the user', function () {
+    $this->travelTo(now()->subMinute());
+
     $emailCodeAuthentication = Arr::first(Filament::getCurrentOrDefaultPanel()->getMultiFactorAuthenticationProviders());
 
     $userToAuthenticate = User::factory()
@@ -93,6 +95,41 @@ it('can resend the code to the user', function () {
         ->call('authenticate');
 
     Notification::assertSentTimes(VerifyEmailCodeAuthentication::class, 1);
+
+    $this->travelBack();
+
+    $livewire
+        ->callAction(TestAction::make('resend')
+            ->schemaComponent("multiFactorChallengeForm.{$emailCodeAuthentication->getId()}.code"));
+
+    Notification::assertSentTimes(VerifyEmailCodeAuthentication::class, 2);
+});
+
+it('can not resend the code to the user more than once per minute', function () {
+    $this->travelTo(now()->subMinute());
+
+    $emailCodeAuthentication = Arr::first(Filament::getCurrentOrDefaultPanel()->getMultiFactorAuthenticationProviders());
+
+    $userToAuthenticate = User::factory()
+        ->hasEmailCodeAuthentication()
+        ->create();
+
+    $livewire = livewire(Login::class)
+        ->fillForm([
+            'email' => $userToAuthenticate->email,
+            'password' => 'password',
+        ])
+        ->call('authenticate');
+
+    Notification::assertSentTimes(VerifyEmailCodeAuthentication::class, 1);
+
+    $livewire
+        ->callAction(TestAction::make('resend')
+            ->schemaComponent("multiFactorChallengeForm.{$emailCodeAuthentication->getId()}.code"));
+
+    Notification::assertSentTimes(VerifyEmailCodeAuthentication::class, 1);
+
+    $this->travelBack();
 
     $livewire
         ->callAction(TestAction::make('resend')
